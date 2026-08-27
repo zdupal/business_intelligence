@@ -3,7 +3,7 @@
 **Name:** Zina Dupal
 **Semester:** Fall 2026
 
-### Course Topics
+## Course Topics
 * Data Acquisition & Transformation
 * Data Visualization & Communication
 * Exploratory Data Mining
