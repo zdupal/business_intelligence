@@ -1,0 +1,68 @@
+---
+title: "hw 04"
+author: "zina dupal"
+date: "2026-09-13"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    numbered_sections: true
+    code_folding: show
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment 04: Subsetting and Import
+
+```{r}
+con = DBI::dbConnect(RSQLite::SQLite(), "../data/midwest_airbnb.db")
+listings = DBI::dbReadTable(con, "listings")
+```
+
+## A1: How many listings (rows) does `listings` have?
+```{r A1}
+nrow(listings)
+```
+
+## A2: How many of the listings are in Columbus? The `city` column is `"Chicago"`, `"Columbus"`, or `"Twin Cities"`.
+```{r A2}
+sum(listings$city == "Columbus")
+```
+
+## A3: Which of these is the name of the most expensive listing in Chicago (highest price, in US dollars per night)? All four are real Chicago listings from the data.
+```{r A3}
+chicago = listings[listings$city == "Chicago", ]
+chicago$name[which.max(chicago$price)]
+```
+
+## A4: How many distinct values does the `neighbourhood` column contain among the Chicago listings? 
+```{r A4}
+length(unique(listings$neighbourhood[listings$city == "Chicago"]))
+```
+
+## A5: How many listings are run by a superhost? The `host_is_superhost` column is `"t"` for a superhost, `"f"` otherwise, and `NA` for a few hosts, so tell `sum()` to skip the `NA`s.
+```{r A5}
+sum(listings$host_is_superhost == "t", na.rm = TRUE)
+```
+
+## A6: How many listings cost more than $1,000 per night? The `price` column is numeric, in US dollars per night.
+```{r A6}
+sum(listings$price > 1000)
+```
+
+## B1: Which statement is correct about reading a CSV file from a URL and from a file on disk? 
+#### **readr::read_csv() works for both: pass a URL or a file path as the same first argument**
+
+## B2: In class, the BLS occupation workbook had to be downloaded in a browser before R could read it. Why? 
+#### **read_excel() reads only files on disk, and the BLS site blocks scripted downloads** 
+
+## B3: Your project has the folders `markdowns/` and `data/` side by side. When you knit `markdowns/class05.Rmd`, which path reaches `data/occupation.xlsx`? 
+#### **../data/occupation.xlsx**
+
+## B4: What does `DBI::dbReadTable(con, "listings")` return? 
+#### **A data frame with one row per record in the table**
+
+
