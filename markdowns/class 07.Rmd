@@ -1,0 +1,67 @@
+---
+title: "class 07"
+author: "zina dupal"
+date: "2026-09-16"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    numbered_sections: true
+    code_folding: show
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Demo
+```{r demo}
+con = DBI::dbConnect(RSQLite::SQLite(), "../data/scout.db")
+postings = DBI::dbReadTable(con, "scout_postings")
+DBI::dbDisconnect(con)
+
+jobs = postings |>
+  dplyr::select(company, title, location_state, remote, category, posted_at, last_seen_at) |>
+  dplyr::mutate(dplyr::across(dplyr::ends_with("_at"), as.Date),
+                days_open = as.numeric(last_seen_at - posted_at))
+
+# For Q1 (Which category is remote-friendly?), we need the following:
+# - # of jobs per category
+# - fraction of those jobs that are remote-friendly
+
+jobs |>
+  dplyr::group_by(category) |>
+  dplyr::summarise(
+    postings = dplyr::n(), # counting the # of rows per category
+    remote_share = mean(remote) |> round(3)
+  )
+  
+# For Q2: Among full-time postings, which states have the highest remote share?
+  
+jobs |>
+  dplyr::filter(category == "fulltime") |>
+  dplyr::group_by(location_state) |>
+  dplyr::summarise(
+    postings = dplyr::n(), # counting the # of rows per state
+    remote_share = mean(remote) |> round(3)
+  ) |>
+  dplyr::filter(postings >= 50) |> # up to you to determine the min threshold
+  dplyr::arrange(dplyr::desc(remote_share)) |>
+  head(3)
+```
+  
+# alternative for Q2
+```{r}
+  jobs |>
+    # dplyr::filter(category == 'fulltime') |>
+    dplyr::group_by(location_state, category) |>
+    dplyr::summarise(
+      postings = dplyr::n(), # counting the # of rows per state
+      remote_share = mean(remote) |> round(3)
+    ) |>
+    dplyr::filter(postings >= 50) |> # up to you to determine the min threshold
+    dplyr::arrange(dplyr::desc(remote_share)) |>
+    head(3)
+```
+
