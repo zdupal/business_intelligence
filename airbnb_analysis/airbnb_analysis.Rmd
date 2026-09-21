@@ -1,0 +1,211 @@
+---
+title: "Airbnb Analysis"
+author: "zina dupal"
+date: "2026-09-18"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    numbered_sections: true
+    code_folding: show
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+con = DBI::dbConnect(RSQLite::SQLite(), "../data/midwest_airbnb_extended.db")
+listings     = DBI::dbReadTable(con, "listings") |> tibble::as_tibble()
+availability = DBI::dbReadTable(con, "availability_monthly") |> tibble::as_tibble()
+reviews      = DBI::dbReadTable(con, "reviews_monthly") |> tibble::as_tibble()
+DBI::dbDisconnect(con)
+```
+
+## Task 1: Who owns the market
+```{r task 1}
+host_counts = listings |>
+  dplyr::count(host_id, name = "host_listings")
+
+listings_hosts = listings |>
+  dplyr::left_join(host_counts, by = "host_id")
+
+host_counts |>
+  dplyr::filter(host_listings >= 10) |>
+  dplyr::summarise(A1 = dplyr::n())
+
+listings_hosts |>
+  dplyr::filter(city == "Chicago") |>
+  dplyr::summarise(
+    A2 = mean(host_listings >= 10) * 100
+  )
+```
+
+## Task 2: Value for a family of four
+```{r task 2}
+listings |>
+  dplyr::filter(
+    room_type == "Entire home/apt",
+    accommodates >= 4,
+    number_of_reviews >= 10,
+    review_scores_rating >= 4.8
+  ) |>
+  dplyr::mutate(
+    price_per_person = price / accommodates
+  ) |>
+  dplyr::group_by(city, neighbourhood) |>
+  dplyr::summarise(
+    median_price_per_person = median(price_per_person, na.rm = TRUE),
+    n = dplyr::n()
+  ) |>
+  dplyr::filter(
+    n >= 20,
+    city == "Columbus"
+  ) |>
+  dplyr::arrange(median_price_per_person)
+```
+
+## Task 3: What earns
+```{r task 3}
+listings |>
+  dplyr::group_by(city, room_type) |>
+  dplyr::summarise(
+    dplyr::across(
+      c(price, reviews_per_month, estimated_revenue_l365d),
+      ~ median(.x, na.rm = TRUE)
+    )
+  ) |>
+  dplyr::filter(
+    city == "Twin Cities",
+    room_type == "Entire home/apt"
+  )
+```
+
+## Task 4: Concentration
+```{r task 4}
+top_listings = listings |>
+  dplyr::group_by(city) |>
+  dplyr::arrange(
+    dplyr::desc(estimated_revenue_l365d),
+    .by_group = TRUE
+  ) |>
+  dplyr::mutate(
+    rank = dplyr::row_number(),
+    cutoff = ceiling(0.10 * dplyr::n())
+  ) |>
+  dplyr::filter(rank <= cutoff)
+```
+
+```{r}
+top_revenue = top_listings |>
+  dplyr::filter(city == "Columbus") |>
+  dplyr::summarise(
+    top_revenue = sum(estimated_revenue_l365d, na.rm = TRUE)
+  )
+
+total_revenue = listings |>
+  dplyr::filter(city == "Columbus") |>
+  dplyr::summarise(
+    total_revenue = sum(estimated_revenue_l365d, na.rm = TRUE)
+  )
+
+top_revenue$top_revenue / total_revenue$total_revenue * 100
+```
+
+## Task 5: The year ahead
+```{r task 5}
+october = availability |>
+  dplyr::filter(month == "2026-10")
+
+october_listings = listings |>
+  dplyr::filter(room_type == "Entire home/apt") |>
+  dplyr::inner_join(october, by = "id")
+
+october_listings |>
+  dplyr::group_by(city) |>
+  dplyr::summarise(
+    share_mostly_taken =
+      mean(nights_available < 0.5 * nights_in_month) * 100
+  ) |>
+  dplyr::arrange(share_mostly_taken)
+```
+
+## Task 6: Demand by season
+```{r task 6}
+monthly_reviews = reviews |>
+  dplyr::filter(
+    month >= "2025-07",
+    month <= "2026-06"
+  ) |>
+  dplyr::inner_join(listings, by = "id") |>
+  dplyr::group_by(city, month) |>
+  dplyr::summarise(
+    total_reviews = sum(reviews),
+    .groups = "drop"
+  )
+
+twin_cities = monthly_reviews |>
+  dplyr::filter(city == "Twin Cities") |>
+  dplyr::arrange(dplyr::desc(total_reviews))
+
+twin_cities
+```
+
+```{r}
+twin_cities |>
+  dplyr::summarise(
+    A9 = max(total_reviews) / min(total_reviews)
+  )
+```
+
+
+## Task 7: The Superhost premium
+```{r task 7}
+superhost_summary = listings |>
+  dplyr::filter(
+    room_type == "Entire home/apt",
+    host_is_superhost %in% c("t", "f")
+  ) |>
+  dplyr::group_by(city, host_is_superhost) |>
+  dplyr::summarise(
+    median_price = median(price, na.rm = TRUE),
+    median_rating = median(review_scores_rating, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+superhost_summary
+```
+
+```{r}
+superhost_summary |>
+  dplyr::group_by(city) |>
+  dplyr::summarise(
+    premium =
+      median_price[host_is_superhost == "t"] -
+      median_price[host_is_superhost == "f"]
+  )
+```
+
+## Task 8: What the join lost
+```{r task 8}
+unmatched = listings |>
+  dplyr::anti_join(availability, by = "id")
+
+unmatched |>
+  dplyr::summarise(
+    A10 = dplyr::n()
+  )
+
+unmatched |>
+  dplyr::count(city) |>
+  dplyr::arrange(dplyr::desc(n))
+```
+
+## B1, the badge. 
+#### You advise a Twin Cities host who is one good review away from Superhost status. Using your three premiums from Task 7, tell them in two or three sentences whether the badge is likely to raise the price they can charge, and name one other number in this data you would check before telling them the badge is not worth it.
+In the `Twin Cities`, `Superhosts` charge a median price about $1.38 lower than non-`Superhosts`. The `Superhost` badge is not associated with a higher median price in the `Twin Cities`, where the premium is -$1.38, compared with positive premiums of $43.80 in `Chicago` and $40.50 in `Columbus`. Before deciding the badge is not worth it, I would also compare the median review rating for `Twin Cities` Superhosts and non-`Superhosts`.
+
+## B2, the cap. 
+#### Compute the Task 1 share (listings held by hosts with 10 or more listings) and the Task 4 share (revenue earned by the top 10 percent) for all three cities. A city council member reads those six numbers and proposes a rule: no host may run more than ten listings. In two or three sentences, say which of the three cities the rule would change most and why, quoting the shares, and name one thing this data cannot tell the council.
+
