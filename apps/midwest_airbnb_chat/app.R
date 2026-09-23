@@ -41,7 +41,7 @@ ui = page_sidebar(
     ),
     accordion_panel(
       "About",
-      "Explore 14,887 Airbnb listings from Chicago, Columbus, and the Twin Cities. Built by Zina Dupal."
+      "This app explores 14,887 listings from Inside Airbnb: Chicago (2026-07-20), Columbus (2026-07-23), and the Twin Cities (2026-07-21). Built by Zina Dupal for ISA 401 at Miami University."
     )
   )
 )
