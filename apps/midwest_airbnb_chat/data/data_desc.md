@@ -18,7 +18,28 @@
 | `name` | text | Listing title as shown on Airbnb (for example "Tiny Studio Apartment 94 Walk Score"). Never empty. |
 | `price` | real | Nightly price in U.S. dollars on the snapshot date, with the dollar sign and commas removed. Ranges from 2.56 to 11,412; never `NULL` (rows without a price were dropped). |
 | `room_type` | text | Airbnb's four listing categories: `Entire home/apt` (11,652 rows), `Private room` (2,951), `Hotel room` (246), or `Shared room` (38). |
+| `host_id` | text | Airbnb's unique identifier for the host of the listing. |
+| `host_name` | text | Name of the host associated with the listing. |
+| `host_since` | text | Date the host account was created on Airbnb. |
+| `host_is_superhost` | text | Whether the host is an Airbnb Superhost; `t` indicates true and `f` indicates false. |
+| `neighbourhood` | text | Inside Airbnb's `neighbourhood_cleansed` field; the neighbourhood where the listing is located. |
+| `latitude` | real | Latitude coordinate of the listing. |
+| `longitude` | real | Longitude coordinate of the listing. |
+| `property_type` | text | Type of property or accommodation represented by the listing. |
+| `accommodates` | integer | Maximum number of guests the listing accommodates. |
+| `bedrooms` | real | Number of bedrooms in the listing. |
+| `beds` | real | Number of beds in the listing. |
+| `bathrooms_text` | text | Text description of the number and type of bathrooms in the listing. |
+| `minimum_nights` | integer | Minimum number of nights required for a booking. |
+| `availability_365` | integer | Number of days the listing is shown as available during the next 365 days. An unavailable day may be booked by a guest or blocked by the host. |
+| `number_of_reviews` | integer | Total number of reviews received by the listing. |
+| `number_of_reviews_ltm` | integer | Number of reviews received by the listing in the last 12 months. |
+| `first_review` | text | Date of the listing's first review. |
+| `last_review` | text | Date of the listing's most recent review. |
+| `review_scores_rating` | real | Overall review rating score for the listing. |
+| `reviews_per_month` | real | Average number of reviews the listing receives per month. |
+| `instant_bookable` | text | Whether the listing can be booked without prior host approval; `t` indicates true and `f` indicates false. |
+| `estimated_revenue_l365d` | real | Estimated revenue for the listing over the last 365 days. |
+| `amenities_count` | integer | Number of items in the listing's `amenities` list, computed for this course. |
 
-Continue the table for the remaining 23 columns (Assignment 05): `host_id`, `host_name`, `host_since`, `host_is_superhost`, `neighbourhood`, `latitude`, `longitude`, `property_type`, `accommodates`, `bedrooms`, `beds`, `bathrooms_text`, `minimum_nights`, `availability_365`, `number_of_reviews`, `number_of_reviews_ltm`, `first_review`, `last_review`, `review_scores_rating`, `reviews_per_month`, `instant_bookable`, `estimated_revenue_l365d`, `amenities_count`.
 
-Two hints: `neighbourhood` is Inside Airbnb's `neighbourhood_cleansed` column, and `amenities_count` is not an Inside Airbnb column; it was computed for this course as the number of items in each listing's `amenities` list. Everything else keeps its Inside Airbnb name, so the data dictionary linked above explains it.
