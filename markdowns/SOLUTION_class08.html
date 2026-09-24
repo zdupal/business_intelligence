@@ -11,7 +11,7 @@
 
 <meta name="author" content="Fadel M Megahed" />
 
-<meta name="date" content="2026-09-21" />
+<meta name="date" content="2026-09-23" />
 
 <title>Class 08</title>
 
@@ -1589,21 +1589,184 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Class 08</h1>
 <h4 class="author">Fadel M Megahed</h4>
-<h4 class="date">2026-09-21</h4>
+<h4 class="date">2026-09-23</h4>
 
 </div>
 
 
-<div id="cincy-crashes" class="section level2" number="1">
-<h2><span class="header-section-number">1</span> Cincy Crashes</h2>
+<div id="illustrating-the-httr2-functions" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Illustrating the
+<code>httr2</code> functions</h1>
 <pre class="r"><code>httr2::request(&quot;https://data.cincinnati-oh.gov/resource/rvmt-pkmq.json&quot;) |&gt;
   httr2::req_url_query(&quot;$limit&quot; = 5) |&gt;
   httr2::req_perform() |&gt;
   httr2::resp_body_string() |&gt;
-  jsonlite::fromJSON() -&gt; cincy_crashes</code></pre>
+  jsonlite::fromJSON()</code></pre>
+<pre><code>##         address_x latitude_x longitude_x  age community_council_neighborhood
+## 1 S I75 AT 8-5 MM  39.186955  -84.483518   27                            N/A
+## 2 S I75 AT 8-5 MM  39.186955  -84.483068   24                            N/A
+## 3 16XX YONKERS AV   39.10227   -84.51183 &lt;NA&gt;                       DOWNTOWN
+## 4 55XX MEDPACE WY  39.160396  -84.401551   18                   MADISONVILLE
+## 5 55XX MEDPACE WY  39.160306  -84.401171   37                   MADISONVILLE
+##        cpd_neighborhood sna_neighborhood               crashdate
+## 1                   N/A              N/A 2026-08-23T14:00:00.000
+## 2                   N/A              N/A 2026-08-23T14:00:00.000
+## 3 C. B. D. / RIVERFRONT         DOWNTOWN 2026-08-23T13:57:00.000
+## 4          MADISONVILLE     MADISONVILLE 2026-08-23T13:53:00.000
+## 5          MADISONVILLE     MADISONVILLE 2026-08-23T13:53:00.000
+##                  crashseverity crashseverityid       datecrashreported
+## 1 2 - SERIOUS INJURY SUSPECTED          201902 2026-08-23T14:04:00.000
+## 2 2 - SERIOUS INJURY SUSPECTED          201902 2026-08-23T14:04:00.000
+## 3     5 - PROPERTY DAMAGE ONLY          201905 2026-08-23T13:57:00.000
+## 4     5 - PROPERTY DAMAGE ONLY          201905 2026-08-23T13:53:00.000
+## 5     5 - PROPERTY DAMAGE ONLY          201905 2026-08-23T13:53:00.000
+##   dayofweek     gender                     injuries
+## 1       SUN   M - MALE 2 - SUSPECTED SERIOUS INJURY
+## 2       SUN   M - MALE      5 - NO APPARENTY INJURY
+## 3       SUN F - FEMALE      5 - NO APPARENTY INJURY
+## 4       SUN   M - MALE      5 - NO APPARENTY INJURY
+## 5       SUN   M - MALE      5 - NO APPARENTY INJURY
+##                             instanceid lightconditionsprimary localreportno
+## 1 351DA301-B443-429F-A509-B4FAD8C7C13F           1 - DAYLIGHT     265009281
+## 2 351DA301-B443-429F-A509-B4FAD8C7C13F           1 - DAYLIGHT     265009281
+## 3 7617C11A-52A6-480B-91D8-BAA05420231E           1 - DAYLIGHT     265009280
+## 4 290BF5EE-4D29-444B-93FC-BF21544EB768           1 - DAYLIGHT     265009279
+## 5 290BF5EE-4D29-444B-93FC-BF21544EB768           1 - DAYLIGHT     265009279
+##                   mannerofcrash roadconditionsprimary        roadcontour
+## 1                  2 - REAR-END              01 - DRY 2 - STRAIGHT GRADE
+## 2                  2 - REAR-END              01 - DRY 2 - STRAIGHT GRADE
+## 3 7 - SIDESWIPE, SAME DIRECTION              01 - DRY 2 - STRAIGHT GRADE
+## 4                     6 - ANGLE              01 - DRY 1 - STRAIGHT LEVEL
+## 5                     6 - ANGLE              01 - DRY 1 - STRAIGHT LEVEL
+##                         roadsurface                  unittype typeofperson
+## 1 2 - BLACKTOP, BITUMINOUS, ASPHALT 07 - MOTORCYCLE 2 WHEELED   D - DRIVER
+## 2 2 - BLACKTOP, BITUMINOUS, ASPHALT        01 - PASSENGER CAR   D - DRIVER
+## 3 2 - BLACKTOP, BITUMINOUS, ASPHALT        01 - PASSENGER CAR   D - DRIVER
+## 4 2 - BLACKTOP, BITUMINOUS, ASPHALT        01 - PASSENGER CAR   D - DRIVER
+## 5 2 - BLACKTOP, BITUMINOUS, ASPHALT        01 - PASSENGER CAR   D - DRIVER
+##     weather   zip roadclass        roadclassdesc
+## 1 1 - CLEAR 45237      &lt;NA&gt;                 &lt;NA&gt;
+## 2 1 - CLEAR 45237      &lt;NA&gt;                 &lt;NA&gt;
+## 3 1 - CLEAR 45225      &lt;NA&gt;                 &lt;NA&gt;
+## 4 1 - CLEAR 45227         3 Minor Arterial Roads
+## 5 1 - CLEAR 45227         3 Minor Arterial Roads</code></pre>
+<div id="fred-example" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> FRED Example</h2>
+<pre class="r"><code>ohio_jobs = 
+  httr2::request(&quot;https://api.stlouisfed.org/fred/series/observations&quot;) |&gt;
+  httr2::req_url_query(
+    series_id = &quot;IHLIDXUSOH&quot;,
+    api_key = Sys.getenv(&quot;FRED_API_KEY&quot;),
+    file_type = &quot;json&quot;
+  ) |&gt;
+  # nothing has been sent yet
+  httr2::req_perform() |&gt;
+  httr2::resp_body_string() |&gt;
+  jsonlite::fromJSON()
+
+dplyr::glimpse(ohio_jobs)</code></pre>
+<pre><code>## List of 13
+##  $ realtime_start   : chr &quot;2026-09-23&quot;
+##  $ realtime_end     : chr &quot;2026-09-23&quot;
+##  $ observation_start: chr &quot;1600-01-01&quot;
+##  $ observation_end  : chr &quot;9999-12-31&quot;
+##  $ units            : chr &quot;lin&quot;
+##  $ output_type      : int 1
+##  $ file_type        : chr &quot;json&quot;
+##  $ order_by         : chr &quot;observation_date&quot;
+##  $ sort_order       : chr &quot;asc&quot;
+##  $ count            : int 2415
+##  $ offset           : int 0
+##  $ limit            : int 100000
+##  $ observations     :&#39;data.frame&#39;:   2415 obs. of  4 variables:
+##   ..$ realtime_start: chr [1:2415] &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; ...
+##   ..$ realtime_end  : chr [1:2415] &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; ...
+##   ..$ date          : chr [1:2415] &quot;2020-02-01&quot; &quot;2020-02-02&quot; &quot;2020-02-03&quot; &quot;2020-02-04&quot; ...
+##   ..$ value         : chr [1:2415] &quot;100.0&quot; &quot;99.99&quot; &quot;99.96&quot; &quot;100.01&quot; ...</code></pre>
+<pre class="r"><code>ohio_df = ohio_jobs$observations # we saw that the data is in observations
+
+dplyr::glimpse(ohio_df)</code></pre>
+<pre><code>## Rows: 2,415
+## Columns: 4
+## $ realtime_start &lt;chr&gt; &quot;2026-09-23&quot;, &quot;2026-09-23&quot;, &quot;2026-09-23&quot;, &quot;2026-09-23&quot;,…
+## $ realtime_end   &lt;chr&gt; &quot;2026-09-23&quot;, &quot;2026-09-23&quot;, &quot;2026-09-23&quot;, &quot;2026-09-23&quot;,…
+## $ date           &lt;chr&gt; &quot;2020-02-01&quot;, &quot;2020-02-02&quot;, &quot;2020-02-03&quot;, &quot;2020-02-04&quot;,…
+## $ value          &lt;chr&gt; &quot;100.0&quot;, &quot;99.99&quot;, &quot;99.96&quot;, &quot;100.01&quot;, &quot;100.04&quot;, &quot;100.17&quot;…</code></pre>
+<pre class="r"><code># another approach to filter the dates would be:
+ohio_df |&gt; 
+  # overwrite the date col and convert to date (from chr)
+  dplyr::mutate(date = lubridate::ymd(date)) |&gt; 
+  # bec it is a date, we can do logical checks on it and keep dates from sep 01, 2026
+  dplyr::filter(date &gt;= &#39;2026-09-01&#39;) -&gt; ohio_df_sept_2026</code></pre>
+</div>
+<div id="usa-jobs" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> USA Jobs</h2>
+<pre class="r"><code>httr2::request(&quot;https://data.usajobs.gov/api/search&quot;) |&gt;
+  httr2::req_url_query(Keyword = &quot;Data Analyst&quot;, ResultsPerPage = 500) |&gt;
+  httr2::req_headers(
+    Host = &quot;data.usajobs.gov&quot;,
+    &quot;User-Agent&quot; = &quot;fmegahed@miamioh.edu&quot;,
+    &quot;Authorization-Key&quot; = Sys.getenv(&quot;USAJOBS_API_KEY&quot;)
+  ) |&gt;
+  httr2::req_perform() |&gt; 
+  httr2::resp_body_string() |&gt; 
+  jsonlite::fromJSON(flatten = T) -&gt; usa_jobs_data
+
+
+usa_jobs_df = usa_jobs_data$SearchResult$SearchResultItems
+
+jobs_small = usa_jobs_df |&gt;
+  dplyr::select(
+    title = MatchedObjectDescriptor.PositionTitle,
+    department = MatchedObjectDescriptor.DepartmentName,
+    agency = MatchedObjectDescriptor.OrganizationName,
+    location = MatchedObjectDescriptor.PositionLocationDisplay,
+    closes = MatchedObjectDescriptor.ApplicationCloseDate
+  )
+
+## Easy way -- since we looked for data analyst as a key word
+nrow(jobs_small)</code></pre>
+<pre><code>## [1] 233</code></pre>
+<pre class="r"><code># q 2
+table(jobs_small$department) |&gt; sort(decreasing = T) |&gt; head(3)</code></pre>
+<pre><code>## 
+##    Department of the Air Force Department of Veterans Affairs 
+##                             50                             50 
+##          Department of Defense 
+##                             31</code></pre>
+<pre class="r"><code>jobs_small |&gt; dplyr::count(department) |&gt; 
+  dplyr::arrange(dplyr::desc(n)) |&gt; head(3)</code></pre>
+<pre><code>##                       department  n
+## 1 Department of Veterans Affairs 50
+## 2    Department of the Air Force 50
+## 3          Department of Defense 31</code></pre>
+<pre class="r"><code>## The harder way (but being literal)
+jobs_small |&gt; dplyr::filter(title == &#39;Data Analyst&#39;) -&gt; count_literal
+
+count_literal |&gt; dplyr::count(department) |&gt; dplyr::arrange(dplyr::desc(n))</code></pre>
+<pre><code>##                       department n
+## 1            Department of State 1
+## 2 Department of Veterans Affairs 1</code></pre>
+<pre class="r"><code>## the harder way (without being literal)
+# Jesse -&gt; Data Analyst or Data Analytics side-by-side
+index_data_analyst = jobs_small$title |&gt; 
+  stringr::str_detect(&quot;Data Analytics|Data Analyst&quot;)
+
+# given that this is a true or fale type result
+# true rows will be kept
+# , nothing means keep all columns
+count_jesse_standard = jobs_small[index_data_analyst , ]
+count_jesse_standard  |&gt; dplyr::count(department) |&gt; dplyr::arrange(dplyr::desc(n))</code></pre>
+<pre><code>##                        department n
+## 1 Department of Homeland Security 2
+## 2             Department of State 2
+## 3            Department of Energy 1
+## 4  Department of Veterans Affairs 1
+## 5 General Services Administration 1</code></pre>
+</div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNsYXNzIDA4Ig0KYXV0aG9yOiAiRmFkZWwgTSBNZWdhaGVkIg0KZGF0ZTogImByIFN5cy5EYXRlKClgIg0Kb3V0cHV0OiANCiAgaHRtbF9kb2N1bWVudDoNCiAgICB0b2M6IHRydWUNCiAgICB0b2NfZmxvYXQ6IHRydWUNCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUNCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlDQogICAgY29kZV9mb2xkaW5nOiBzaG93DQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpDQpgYGANCg0KIyMgQ2luY3kgQ3Jhc2hlcw0KDQpgYGB7ciBhcGlfaW50cm99DQpodHRyMjo6cmVxdWVzdCgiaHR0cHM6Ly9kYXRhLmNpbmNpbm5hdGktb2guZ292L3Jlc291cmNlL3J2bXQtcGttcS5qc29uIikgfD4NCiAgaHR0cjI6OnJlcV91cmxfcXVlcnkoIiRsaW1pdCIgPSA1KSB8Pg0KICBodHRyMjo6cmVxX3BlcmZvcm0oKSB8Pg0KICBodHRyMjo6cmVzcF9ib2R5X3N0cmluZygpIHw+DQogIGpzb25saXRlOjpmcm9tSlNPTigpIC0+IGNpbmN5X2NyYXNoZXMNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNsYXNzIDA4Ig0KYXV0aG9yOiAiRmFkZWwgTSBNZWdhaGVkIg0KZGF0ZTogJ2ByIFN5cy5EYXRlKClgJw0Kb3V0cHV0OiANCiAgaHRtbF9kb2N1bWVudDoNCiAgICB0b2M6IHRydWUNCiAgICB0b2NfZmxvYXQ6IHRydWUNCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUNCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlDQogICAgY29kZV9mb2xkaW5nOiBzaG93DQotLS0NCg0KYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9DQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpDQpgYGANCg0KIyBJbGx1c3RyYXRpbmcgdGhlIGBodHRyMmAgZnVuY3Rpb25zDQoNCmBgYHtyIHNsaWRlMDh9DQpodHRyMjo6cmVxdWVzdCgiaHR0cHM6Ly9kYXRhLmNpbmNpbm5hdGktb2guZ292L3Jlc291cmNlL3J2bXQtcGttcS5qc29uIikgfD4NCiAgaHR0cjI6OnJlcV91cmxfcXVlcnkoIiRsaW1pdCIgPSA1KSB8Pg0KICBodHRyMjo6cmVxX3BlcmZvcm0oKSB8Pg0KICBodHRyMjo6cmVzcF9ib2R5X3N0cmluZygpIHw+DQogIGpzb25saXRlOjpmcm9tSlNPTigpDQpgYGANCg0KDQojIyBGUkVEIEV4YW1wbGUNCg0KYGBge3IgZnJlZH0NCm9oaW9fam9icyA9IA0KICBodHRyMjo6cmVxdWVzdCgiaHR0cHM6Ly9hcGkuc3Rsb3Vpc2ZlZC5vcmcvZnJlZC9zZXJpZXMvb2JzZXJ2YXRpb25zIikgfD4NCiAgaHR0cjI6OnJlcV91cmxfcXVlcnkoDQogICAgc2VyaWVzX2lkID0gIklITElEWFVTT0giLA0KICAgIGFwaV9rZXkgPSBTeXMuZ2V0ZW52KCJGUkVEX0FQSV9LRVkiKSwNCiAgICBmaWxlX3R5cGUgPSAianNvbiINCiAgKSB8Pg0KICAjIG5vdGhpbmcgaGFzIGJlZW4gc2VudCB5ZXQNCiAgaHR0cjI6OnJlcV9wZXJmb3JtKCkgfD4NCiAgaHR0cjI6OnJlc3BfYm9keV9zdHJpbmcoKSB8Pg0KICBqc29ubGl0ZTo6ZnJvbUpTT04oKQ0KDQpkcGx5cjo6Z2xpbXBzZShvaGlvX2pvYnMpDQoNCm9oaW9fZGYgPSBvaGlvX2pvYnMkb2JzZXJ2YXRpb25zICMgd2Ugc2F3IHRoYXQgdGhlIGRhdGEgaXMgaW4gb2JzZXJ2YXRpb25zDQoNCmRwbHlyOjpnbGltcHNlKG9oaW9fZGYpDQoNCiMgYW5vdGhlciBhcHByb2FjaCB0byBmaWx0ZXIgdGhlIGRhdGVzIHdvdWxkIGJlOg0Kb2hpb19kZiB8PiANCiAgIyBvdmVyd3JpdGUgdGhlIGRhdGUgY29sIGFuZCBjb252ZXJ0IHRvIGRhdGUgKGZyb20gY2hyKQ0KICBkcGx5cjo6bXV0YXRlKGRhdGUgPSBsdWJyaWRhdGU6OnltZChkYXRlKSkgfD4gDQogICMgYmVjIGl0IGlzIGEgZGF0ZSwgd2UgY2FuIGRvIGxvZ2ljYWwgY2hlY2tzIG9uIGl0IGFuZCBrZWVwIGRhdGVzIGZyb20gc2VwIDAxLCAyMDI2DQogIGRwbHlyOjpmaWx0ZXIoZGF0ZSA+PSAnMjAyNi0wOS0wMScpIC0+IG9oaW9fZGZfc2VwdF8yMDI2DQoNCmBgYA0KDQoNCiMjIFVTQSBKb2JzDQoNCmBgYHtyIHVzYWpvYnN9DQpodHRyMjo6cmVxdWVzdCgiaHR0cHM6Ly9kYXRhLnVzYWpvYnMuZ292L2FwaS9zZWFyY2giKSB8Pg0KICBodHRyMjo6cmVxX3VybF9xdWVyeShLZXl3b3JkID0gIkRhdGEgQW5hbHlzdCIsIFJlc3VsdHNQZXJQYWdlID0gNTAwKSB8Pg0KICBodHRyMjo6cmVxX2hlYWRlcnMoDQogICAgSG9zdCA9ICJkYXRhLnVzYWpvYnMuZ292IiwNCiAgICAiVXNlci1BZ2VudCIgPSAiZm1lZ2FoZWRAbWlhbWlvaC5lZHUiLA0KICAgICJBdXRob3JpemF0aW9uLUtleSIgPSBTeXMuZ2V0ZW52KCJVU0FKT0JTX0FQSV9LRVkiKQ0KICApIHw+DQogIGh0dHIyOjpyZXFfcGVyZm9ybSgpIHw+IA0KICBodHRyMjo6cmVzcF9ib2R5X3N0cmluZygpIHw+IA0KICBqc29ubGl0ZTo6ZnJvbUpTT04oZmxhdHRlbiA9IFQpIC0+IHVzYV9qb2JzX2RhdGENCg0KDQp1c2Ffam9ic19kZiA9IHVzYV9qb2JzX2RhdGEkU2VhcmNoUmVzdWx0JFNlYXJjaFJlc3VsdEl0ZW1zDQoNCmpvYnNfc21hbGwgPSB1c2Ffam9ic19kZiB8Pg0KICBkcGx5cjo6c2VsZWN0KA0KICAgIHRpdGxlID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuUG9zaXRpb25UaXRsZSwNCiAgICBkZXBhcnRtZW50ID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuRGVwYXJ0bWVudE5hbWUsDQogICAgYWdlbmN5ID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuT3JnYW5pemF0aW9uTmFtZSwNCiAgICBsb2NhdGlvbiA9IE1hdGNoZWRPYmplY3REZXNjcmlwdG9yLlBvc2l0aW9uTG9jYXRpb25EaXNwbGF5LA0KICAgIGNsb3NlcyA9IE1hdGNoZWRPYmplY3REZXNjcmlwdG9yLkFwcGxpY2F0aW9uQ2xvc2VEYXRlDQogICkNCg0KIyMgRWFzeSB3YXkgLS0gc2luY2Ugd2UgbG9va2VkIGZvciBkYXRhIGFuYWx5c3QgYXMgYSBrZXkgd29yZA0KbnJvdyhqb2JzX3NtYWxsKQ0KIyBxIDINCnRhYmxlKGpvYnNfc21hbGwkZGVwYXJ0bWVudCkgfD4gc29ydChkZWNyZWFzaW5nID0gVCkgfD4gaGVhZCgzKQ0Kam9ic19zbWFsbCB8PiBkcGx5cjo6Y291bnQoZGVwYXJ0bWVudCkgfD4gDQogIGRwbHlyOjphcnJhbmdlKGRwbHlyOjpkZXNjKG4pKSB8PiBoZWFkKDMpDQoNCiMjIFRoZSBoYXJkZXIgd2F5IChidXQgYmVpbmcgbGl0ZXJhbCkNCmpvYnNfc21hbGwgfD4gZHBseXI6OmZpbHRlcih0aXRsZSA9PSAnRGF0YSBBbmFseXN0JykgLT4gY291bnRfbGl0ZXJhbA0KDQpjb3VudF9saXRlcmFsIHw+IGRwbHlyOjpjb3VudChkZXBhcnRtZW50KSB8PiBkcGx5cjo6YXJyYW5nZShkcGx5cjo6ZGVzYyhuKSkNCg0KIyMgdGhlIGhhcmRlciB3YXkgKHdpdGhvdXQgYmVpbmcgbGl0ZXJhbCkNCiMgSmVzc2UgLT4gRGF0YSBBbmFseXN0IG9yIERhdGEgQW5hbHl0aWNzIHNpZGUtYnktc2lkZQ0KaW5kZXhfZGF0YV9hbmFseXN0ID0gam9ic19zbWFsbCR0aXRsZSB8PiANCiAgc3RyaW5ncjo6c3RyX2RldGVjdCgiRGF0YSBBbmFseXRpY3N8RGF0YSBBbmFseXN0IikNCg0KIyBnaXZlbiB0aGF0IHRoaXMgaXMgYSB0cnVlIG9yIGZhbGUgdHlwZSByZXN1bHQNCiMgdHJ1ZSByb3dzIHdpbGwgYmUga2VwdA0KIyAsIG5vdGhpbmcgbWVhbnMga2VlcCBhbGwgY29sdW1ucw0KY291bnRfamVzc2Vfc3RhbmRhcmQgPSBqb2JzX3NtYWxsW2luZGV4X2RhdGFfYW5hbHlzdCAsIF0NCmNvdW50X2plc3NlX3N0YW5kYXJkICB8PiBkcGx5cjo6Y291bnQoZGVwYXJ0bWVudCkgfD4gZHBseXI6OmFycmFuZ2UoZHBseXI6OmRlc2MobikpDQpgYGANCg0KDQoNCg0KDQoNCg0KDQo=</div>
 
 
 </div>
