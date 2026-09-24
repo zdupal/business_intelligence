@@ -216,7 +216,7 @@ unmatched |>
 
 ## B1, the badge.
 
-> In the Twin Cities, Superhosts charge a median price about $1.38 lower than non-Superhosts. The Superhost badge is not associated with a higher median price in the Twin Cities, where the premium is -$1.38, compared with $43.80 in Chicago and $40.50 in Columbus. Before determining if the badge is not worth it, I would also compare the median review rating for Twin Cities Superhosts and non-Superhosts.
+> Chicago: $43.80; Columbus: $40.50; Twin Cities: -$1.38. In the Twin Cities, Superhosts charge a median price about $1.38 lower than non-Superhosts, so the Superhost badge is not associated with a higher median price in the Twin Cities. Before determining if the badge is not worth it, I would also compare the median review rating for Twin Cities Superhosts and non-Superhosts.
 
 ## B2, the cap.
 
@@ -253,6 +253,6 @@ revenue_share = listings |>
 revenue_share
 ```
 
-> Columbus would be affected most because hosts with 10 or more listings control 37.1% of its listings, compared with 31.9% in Chicago and 17.2% in the Twin Cities; its top 10% of listings also earn 36.1% of estimated revenue, compared with 40.7% in Chicago and 40.3% in the Twin Cities. However, this data cannot tell the council whether one host ID ALWAYS represents one business.
+> Columbus would be affected most because hosts with 10 or more listings control 37.1% of its listings, compared with 31.9% in Chicago and 17.2% in the Twin Cities; its top 10% of listings also earn 36.1% of estimated revenue, compared with 40.7% in Chicago and 40.3% in the Twin Cities. However, this data cannot tell the council whether one host ID always represents one business.
 
 
