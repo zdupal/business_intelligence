@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="zina dupal" />
+<meta name="author" content="Fadel M Megahed" />
 
-<meta name="date" content="2026-09-21" />
+<meta name="date" content="2026-09-28" />
 
-<title>class 08</title>
+<title>Class 10: Web Scraping</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1587,234 +1587,84 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">class 08</h1>
-<h4 class="author">zina dupal</h4>
-<h4 class="date">2026-09-21</h4>
+<h1 class="title toc-ignore">Class 10: Web Scraping</h1>
+<h4 class="author">Fadel M Megahed</h4>
+<h4 class="date">2026-09-28</h4>
 
 </div>
 
 
-<div id="showing-the-httr2-functions" class="section level2">
-<h2>Showing the <code>httr2</code> functions</h2>
-<pre class="r"><code>httr2::request(&quot;https://data.cincinnati-oh.gov/resource/rvmt-pkmq.json&quot;) |&gt;
-  httr2::req_url_query(&quot;$limit&quot; = 5) |&gt;
-  httr2::req_perform() |&gt;
-  httr2::resp_body_string() |&gt;
-  jsonlite::fromJSON()</code></pre>
-<pre><code>##                   address_x latitude_x longitude_x  age
-## 1           26XX VICTORY PY  39.128206  -84.483968   48
-## 2 20XX WESTWOOD NORTHERN BV  39.145131  -84.567144 &lt;NA&gt;
-## 3 20XX WESTWOOD NORTHERN BV  39.145191  -84.565954   28
-## 4            7XX TRENTON AV  39.106722  -84.589213   38
-## 5            7XX TRENTON AV  39.106672  -84.589373 &lt;NA&gt;
-##   community_council_neighborhood  cpd_neighborhood sna_neighborhood
-## 1              EAST WALNUT HILLS EAST WALNUT HILLS     WALNUT HILLS
-## 2                  EAST WESTWOOD    EAST  WESTWOOD    EAST WESTWOOD
-## 3                  EAST WESTWOOD    EAST  WESTWOOD    EAST WESTWOOD
-## 4                WEST PRICE HILL   WEST PRICE HILL  WEST PRICE HILL
-## 5                WEST PRICE HILL   WEST PRICE HILL  WEST PRICE HILL
-##                 crashdate            crashseverity crashseverityid
-## 1 2026-08-24T00:35:00.000 5 - PROPERTY DAMAGE ONLY          201905
-## 2 2026-08-23T23:30:00.000 5 - PROPERTY DAMAGE ONLY          201905
-## 3 2026-08-23T23:30:00.000 5 - PROPERTY DAMAGE ONLY          201905
-## 4 2026-08-23T21:30:00.000 5 - PROPERTY DAMAGE ONLY          201905
-## 5 2026-08-23T21:30:00.000 5 - PROPERTY DAMAGE ONLY          201905
-##         datecrashreported dayofweek     gender                injuries
-## 1 2026-08-24T00:35:00.000       MON F - FEMALE 5 - NO APPARENTY INJURY
-## 2 2026-08-23T23:33:00.000       SUN       &lt;NA&gt; 5 - NO APPARENTY INJURY
-## 3 2026-08-23T23:33:00.000       SUN F - FEMALE 5 - NO APPARENTY INJURY
-## 4 2026-08-23T21:34:00.000       SUN   M - MALE 5 - NO APPARENTY INJURY
-## 5 2026-08-23T21:34:00.000       SUN   M - MALE 5 - NO APPARENTY INJURY
-##                             instanceid     lightconditionsprimary localreportno
-## 1 55C0D0EB-A1A8-4F78-AABD-16C03F921499 3 - DARK - LIGHTED ROADWAY     265009293
-## 2 34D2BE75-51F2-4FE8-A364-94FB4A5A51D6 3 - DARK - LIGHTED ROADWAY     265009292
-## 3 34D2BE75-51F2-4FE8-A364-94FB4A5A51D6 3 - DARK - LIGHTED ROADWAY     265009292
-## 4 7112E5F9-79A3-4639-9FAB-86FD4899F606 3 - DARK - LIGHTED ROADWAY     265009291
-## 5 7112E5F9-79A3-4639-9FAB-86FD4899F606 3 - DARK - LIGHTED ROADWAY     265009291
-##                                               mannerofcrash
-## 1 1 - NOT COLLISION BETWEEN TWO MOTOR VEHICLES IN TRANSPORT
-## 2                                                 6 - ANGLE
-## 3                                                 6 - ANGLE
-## 4                                              2 - REAR-END
-## 5                                              2 - REAR-END
-##   roadconditionsprimary        roadcontour                       roadsurface
-## 1              01 - DRY    3 - CURVE LEVEL 2 - BLACKTOP, BITUMINOUS, ASPHALT
-## 2              01 - DRY    4 - CURVE GRADE 2 - BLACKTOP, BITUMINOUS, ASPHALT
-## 3              01 - DRY    4 - CURVE GRADE 2 - BLACKTOP, BITUMINOUS, ASPHALT
-## 4              01 - DRY 1 - STRAIGHT LEVEL 2 - BLACKTOP, BITUMINOUS, ASPHALT
-## 5              01 - DRY 1 - STRAIGHT LEVEL 2 - BLACKTOP, BITUMINOUS, ASPHALT
-##   roadclass        roadclassdesc                 unittype typeofperson
-## 1         4      Collector Roads       01 - PASSENGER CAR   D - DRIVER
-## 2      &lt;NA&gt;                 &lt;NA&gt; 99 - UNKNOWN OR HIT/SKIP   D - DRIVER
-## 3      &lt;NA&gt;                 &lt;NA&gt;       01 - PASSENGER CAR   D - DRIVER
-## 4         3 Minor Arterial Roads       01 - PASSENGER CAR   D - DRIVER
-## 5         3 Minor Arterial Roads       01 - PASSENGER CAR   D - DRIVER
-##     weather   zip
-## 1 1 - CLEAR 45206
-## 2 1 - CLEAR 45225
-## 3 1 - CLEAR 45225
-## 4 1 - CLEAR 45205
-## 5 1 - CLEAR 45205</code></pre>
+<div id="robotstxt-example-mu-bulletin" class="section level2" number="1">
+<h2><span class="header-section-number">1</span> <code>robotstxt</code>
+example: MU bulletin</h2>
+<p>In the chunk below, we used the <a href="https://github.com/ropensci/robotstxt">robotstxt package</a> to
+check if we are allowed to write a program that scrapes the page: <a href="https://bulletin.miamioh.edu/courses-instruction/isa/" class="uri">https://bulletin.miamioh.edu/courses-instruction/isa/</a>.</p>
+<pre class="r"><code>robotstxt::paths_allowed(
+  paths = &quot;courses-instruction/isa/&quot;,
+  domain=&quot;https://bulletin.miamioh.edu/&quot;
+)</code></pre>
+<pre><code>##  https://bulletin.miamioh.edu/</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>The <code>TRUE</code> above means that we are allowed to scrape
+it.</p>
 </div>
-<div id="fred-example" class="section level2">
-<h2>FRED Example</h2>
-<pre class="r"><code>ohio_jobs = 
-  httr2::request(&quot;https://api.stlouisfed.org/fred/series/observations&quot;) |&gt;
-  httr2::req_url_query(
-    series_id = &quot;IHLIDXUSOH&quot;,
-    api_key = Sys.getenv(&quot;FRED_API_KEY&quot;),
-    file_type = &quot;json&quot;
-  ) |&gt;
-  httr2::req_perform() |&gt;
-  httr2::resp_body_string() |&gt;
-  jsonlite::fromJSON()
-
-dplyr::glimpse(ohio_jobs)</code></pre>
-<pre><code>## List of 13
-##  $ realtime_start   : chr &quot;2026-09-23&quot;
-##  $ realtime_end     : chr &quot;2026-09-23&quot;
-##  $ observation_start: chr &quot;1600-01-01&quot;
-##  $ observation_end  : chr &quot;9999-12-31&quot;
-##  $ units            : chr &quot;lin&quot;
-##  $ output_type      : int 1
-##  $ file_type        : chr &quot;json&quot;
-##  $ order_by         : chr &quot;observation_date&quot;
-##  $ sort_order       : chr &quot;asc&quot;
-##  $ count            : int 2422
-##  $ offset           : int 0
-##  $ limit            : int 100000
-##  $ observations     :&#39;data.frame&#39;:   2422 obs. of  4 variables:
-##   ..$ realtime_start: chr [1:2422] &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; ...
-##   ..$ realtime_end  : chr [1:2422] &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; &quot;2026-09-23&quot; ...
-##   ..$ date          : chr [1:2422] &quot;2020-02-01&quot; &quot;2020-02-02&quot; &quot;2020-02-03&quot; &quot;2020-02-04&quot; ...
-##   ..$ value         : chr [1:2422] &quot;100.0&quot; &quot;99.99&quot; &quot;99.96&quot; &quot;100.01&quot; ...</code></pre>
-<pre class="r"><code>ohio_df = ohio_jobs$observations
-
-ohio_df |&gt;
-  # overwrite the date col and convert to date (from chr)
-  dplyr::mutate(date = lubridate::ymd(date)) |&gt;
-  # because it is a date, we can do logical checks on it and keep dates from sep 01, 2026
-  dplyr::filter(date &gt;= &#39;2026-09-01&#39;) -&gt; ohio_df_sept_2026</code></pre>
+<div id="robotstxt-wikipedia" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> <code>robotstxt</code>:
+Wikipedia</h2>
+<pre class="r"><code>robotstxt::paths_allowed(
+  paths = &quot;/wiki/&quot;, domain = &quot;https://en.wikipedia.org&quot;
+    )</code></pre>
+<pre><code>##  https://en.wikipedia.org</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
-<div id="usa-jobs" class="section level2">
-<h2>USA Jobs</h2>
-<pre class="r"><code>httr2::request(&quot;https://data.usajobs.gov/api/search&quot;) |&gt;
-  httr2::req_url_query(Keyword = &quot;Data Analyst&quot;, ResultsPerPage = 500) |&gt;
-  httr2::req_headers(
-    Host = &quot;data.usajobs.gov&quot;,
-    &quot;User-Agent&quot; = &quot;yourname@miamioh.edu&quot;,
-    &quot;Authorization-Key&quot; = Sys.getenv(&quot;USAJOBS_API_KEY&quot;)
-  ) |&gt;
-  httr2::req_perform() |&gt;
-  httr2::resp_body_string() |&gt;
-  jsonlite::fromJSON(flatten = TRUE) -&gt; usa_jobs_data
+<div id="robotstxt-linkedin" class="section level2" number="3">
+<h2><span class="header-section-number">3</span>
+<code>robotstxt</code>:: LinkedIn</h2>
+<pre class="r"><code># In some cases, the robotstxt provides inconsistent answers
+# typically, you get a warning with the answer that is incorrect
+# solution: drop the trailing slash from the URL
+# even better check with the robots.txt (which is the ground truth)
+robotstxt::paths_allowed(
+  paths = &quot;/jobs/&quot;, domain = &quot;www.linkedin.com&quot;
+    )</code></pre>
+<pre><code>##  www.linkedin.com</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="scrape-miamis-bulletin-for-isa" class="section level2" number="4">
+<h2><span class="header-section-number">4</span> Scrape Miami’s Bulletin
+for ISA</h2>
+<pre class="r"><code># checking whether we are allowed to scrape this info
+# This was done above and found to be TRUE
 
-usa_jobs_df = usa_jobs_data$SearchResult$SearchResultItems
+# I will load the backend of the HTML into R using
+# [a] rvest::read_html() | sometimes rvest::read_html_live() if the page has some dynamic content
+# [b] in some cases, we will craft this as a request as shown in slides httr2::request() &gt; .... &gt; httr2::resp_body_html()
+isa_courses_in_r = rvest::read_html(&quot;https://bulletin.miamioh.edu/courses-instruction/isa/&quot;)
 
-jobs_small = usa_jobs_df |&gt;
-  dplyr::select(
-    title = MatchedObjectDescriptor.PositionTitle,
-    department = MatchedObjectDescriptor.DepartmentName,
-    agency = MatchedObjectDescriptor.OrganizationName,
-    location = MatchedObjectDescriptor.PositionLocationDisplay,
-    closes = MatchedObjectDescriptor.ApplicationCloseDate
-  )</code></pre>
-<pre class="r"><code># easy version
-nrow(jobs_small)</code></pre>
-<pre><code>## [1] 248</code></pre>
-<pre class="r"><code>table(jobs_small$department) |&gt; sort(decreasing = T) |&gt; head(3)</code></pre>
-<pre><code>## 
-## Department of Veterans Affairs    Department of the Air Force 
-##                             56                             47 
-##         Department of the Army 
-##                             36</code></pre>
-<pre class="r"><code>jobs_small |&gt; dplyr::count(department) |&gt; 
-  dplyr::arrange(dplyr::desc(n)) |&gt; head(3)</code></pre>
-<pre><code>##                       department  n
-## 1 Department of Veterans Affairs 56
-## 2    Department of the Air Force 47
-## 3         Department of the Army 36</code></pre>
-<pre class="r"><code># literal version
-jobs_small |&gt; dplyr::filter(title == &#39;Data Analyst&#39;) -&gt; count_literal
+# we will extract the course titles, which we can do in a single pipeline
+# given that they look the same on the rendered web page in Chrome
+# (bolded, same font size and same font type)
 
-# harder version
-index_data_analyst = jobs_small$title |&gt;
-  stringr::str_detect(&quot;Data Analytics|Data Analyst&quot;)
+# CSS selector was obtained by:
+# [a] highlighting what we wanted to pull (ISA 401 course title) in Chrome -&gt; right click
+#  inspect -&gt; right click &gt; copy -&gt; copy selector
+# [b] from this specific example, we were able to get just the title for ISA 401
+# because we had `:nth-child(24)` -&gt; if you were to drop it --&gt; you get all the course titles
+isa_courses_in_r |&gt; 
+  rvest::html_elements(&quot;#sc_sccoursedescs &gt; div &gt; p.courseblocktitle &gt; strong&quot;) |&gt; 
+  rvest::html_text2() -&gt; isa_titles
+  
+# course descriptions [using selector gadget, which does not always work]
+# but when it works it is easier
 
-# given that this is a true or false type result
-# true rows will be kept, nothing means keep all columns
-count_harder_standard = jobs_small[index_data_analyst , ] 
-count_harder_standard |&gt; dplyr::count(department) |&gt;
-dplyr::arrange(dplyr::desc(n))</code></pre>
-<pre><code>##                        department n
-## 1  Department of Veterans Affairs 2
-## 2            Department of Energy 1
-## 3 Department of Homeland Security 1
-## 4           Department of Justice 1
-## 5             Department of State 1
-## 6          Department of the Army 1
-## 7 General Services Administration 1</code></pre>
-<pre class="r"><code>httr2::request(&quot;https://data.usajobs.gov/api/search&quot;) |&gt;
-  httr2::req_url_query(Keyword = &quot;Data Analyst&quot;, ResultsPerPage = 500) |&gt;
-  httr2::req_headers(
-    Host = &quot;data.usajobs.gov&quot;,
-    &quot;User-Agent&quot; = &quot;fmegahed@miamioh.edu&quot;,
-    &quot;Authorization-Key&quot; = Sys.getenv(&quot;USAJOBS_API_KEY&quot;)
-  ) |&gt;
-  httr2::req_perform() |&gt;
-  httr2::resp_body_string() |&gt;
-  jsonlite::fromJSON(flatten = TRUE) -&gt; usa_jobs_list
+isa_courses_in_r |&gt; 
+  rvest::html_elements(&quot;.courseblockdesc&quot;) |&gt; 
+  rvest::html_text2() -&gt; isa_desc
 
-usa_df = usa_jobs_list$SearchResult$SearchResultItems
-
-jobs_small = usa_df |&gt;
-  dplyr::select(
-    title = MatchedObjectDescriptor.PositionTitle,
-    department = MatchedObjectDescriptor.DepartmentName,
-    agency = MatchedObjectDescriptor.OrganizationName,
-    location = MatchedObjectDescriptor.PositionLocationDisplay,
-    closes = MatchedObjectDescriptor.ApplicationCloseDate
-  )
-
-## Answer Based on Query
-nrow(jobs_small)</code></pre>
-<pre><code>## [1] 248</code></pre>
-<pre class="r"><code># returns a named vector
-table(jobs_small$department) |&gt; sort(decreasing = T) |&gt; head(3)</code></pre>
-<pre><code>## 
-## Department of Veterans Affairs    Department of the Air Force 
-##                             56                             47 
-##         Department of the Army 
-##                             36</code></pre>
-<pre class="r"><code># returns a df
-jobs_small |&gt; dplyr::count(department) |&gt; dplyr::arrange(dplyr::desc(n)) |&gt; head(3)</code></pre>
-<pre><code>##                       department  n
-## 1 Department of Veterans Affairs 56
-## 2    Department of the Air Force 47
-## 3         Department of the Army 36</code></pre>
-<pre class="r"><code># answering Anna&#39;s question [note the no pipe; the &amp; statement]
-# there is probably more fancy ways of doing this but this is the easiest
-# with no regular expressions
-index_data_analyst = (
-  stringr::str_detect(jobs_small$title, pattern = &#39;Data&#39;) &amp; 
-  stringr::str_detect(jobs_small$title, pattern = &#39;Analyst&#39;)
-)
-
-
-jobs = jobs_small[index_data_analyst, ]
-table(jobs$department)</code></pre>
-<pre><code>## 
-##                    Department of Energy Department of Health and Human Services 
-##                                       1                                       2 
-##         Department of Homeland Security                   Department of Justice 
-##                                       1                                       1 
-##                     Department of State                  Department of the Army 
-##                                       1                                       1 
-##              Department of the Interior          Department of Veterans Affairs 
-##                                       1                                       2</code></pre>
+df = data.frame(title = isa_titles, description = isa_desc)</code></pre>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiY2xhc3MgMDgiCmF1dGhvcjogInppbmEgZHVwYWwiCmRhdGU6ICIyMDI2LTA5LTIxIgpvdXRwdXQ6IAogIGh0bWxfZG9jdW1lbnQ6CiAgICB0b2M6IHRydWUKICAgIHRvY19mbG9hdDogdHJ1ZQogICAgbnVtYmVyZWRfc2VjdGlvbnM6IHRydWUKICAgIGNvZGVfZm9sZGluZzogc2hvdwogICAgY29kZV9kb3dubG9hZDogdHJ1ZQotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpCmBgYAoKIyMgU2hvd2luZyB0aGUgYGh0dHIyYCBmdW5jdGlvbnMKYGBge3Igc2xpZGUwOH0KaHR0cjI6OnJlcXVlc3QoImh0dHBzOi8vZGF0YS5jaW5jaW5uYXRpLW9oLmdvdi9yZXNvdXJjZS9ydm10LXBrbXEuanNvbiIpIHw+CiAgaHR0cjI6OnJlcV91cmxfcXVlcnkoIiRsaW1pdCIgPSA1KSB8PgogIGh0dHIyOjpyZXFfcGVyZm9ybSgpIHw+CiAgaHR0cjI6OnJlc3BfYm9keV9zdHJpbmcoKSB8PgogIGpzb25saXRlOjpmcm9tSlNPTigpCmBgYAoKIyMgRlJFRCBFeGFtcGxlCmBgYHtyIGZyZWR9Cm9oaW9fam9icyA9IAogIGh0dHIyOjpyZXF1ZXN0KCJodHRwczovL2FwaS5zdGxvdWlzZmVkLm9yZy9mcmVkL3Nlcmllcy9vYnNlcnZhdGlvbnMiKSB8PgogIGh0dHIyOjpyZXFfdXJsX3F1ZXJ5KAogICAgc2VyaWVzX2lkID0gIklITElEWFVTT0giLAogICAgYXBpX2tleSA9IFN5cy5nZXRlbnYoIkZSRURfQVBJX0tFWSIpLAogICAgZmlsZV90eXBlID0gImpzb24iCiAgKSB8PgogIGh0dHIyOjpyZXFfcGVyZm9ybSgpIHw+CiAgaHR0cjI6OnJlc3BfYm9keV9zdHJpbmcoKSB8PgogIGpzb25saXRlOjpmcm9tSlNPTigpCgpkcGx5cjo6Z2xpbXBzZShvaGlvX2pvYnMpCgpvaGlvX2RmID0gb2hpb19qb2JzJG9ic2VydmF0aW9ucwoKb2hpb19kZiB8PgogICMgb3ZlcndyaXRlIHRoZSBkYXRlIGNvbCBhbmQgY29udmVydCB0byBkYXRlIChmcm9tIGNocikKICBkcGx5cjo6bXV0YXRlKGRhdGUgPSBsdWJyaWRhdGU6OnltZChkYXRlKSkgfD4KICAjIGJlY2F1c2UgaXQgaXMgYSBkYXRlLCB3ZSBjYW4gZG8gbG9naWNhbCBjaGVja3Mgb24gaXQgYW5kIGtlZXAgZGF0ZXMgZnJvbSBzZXAgMDEsIDIwMjYKICBkcGx5cjo6ZmlsdGVyKGRhdGUgPj0gJzIwMjYtMDktMDEnKSAtPiBvaGlvX2RmX3NlcHRfMjAyNgpgYGAKCiMjIFVTQSBKb2JzCmBgYHtyIHVzYWpvYnN9Cmh0dHIyOjpyZXF1ZXN0KCJodHRwczovL2RhdGEudXNham9icy5nb3YvYXBpL3NlYXJjaCIpIHw+CiAgaHR0cjI6OnJlcV91cmxfcXVlcnkoS2V5d29yZCA9ICJEYXRhIEFuYWx5c3QiLCBSZXN1bHRzUGVyUGFnZSA9IDUwMCkgfD4KICBodHRyMjo6cmVxX2hlYWRlcnMoCiAgICBIb3N0ID0gImRhdGEudXNham9icy5nb3YiLAogICAgIlVzZXItQWdlbnQiID0gInlvdXJuYW1lQG1pYW1pb2guZWR1IiwKICAgICJBdXRob3JpemF0aW9uLUtleSIgPSBTeXMuZ2V0ZW52KCJVU0FKT0JTX0FQSV9LRVkiKQogICkgfD4KICBodHRyMjo6cmVxX3BlcmZvcm0oKSB8PgogIGh0dHIyOjpyZXNwX2JvZHlfc3RyaW5nKCkgfD4KICBqc29ubGl0ZTo6ZnJvbUpTT04oZmxhdHRlbiA9IFRSVUUpIC0+IHVzYV9qb2JzX2RhdGEKCnVzYV9qb2JzX2RmID0gdXNhX2pvYnNfZGF0YSRTZWFyY2hSZXN1bHQkU2VhcmNoUmVzdWx0SXRlbXMKCmpvYnNfc21hbGwgPSB1c2Ffam9ic19kZiB8PgogIGRwbHlyOjpzZWxlY3QoCiAgICB0aXRsZSA9IE1hdGNoZWRPYmplY3REZXNjcmlwdG9yLlBvc2l0aW9uVGl0bGUsCiAgICBkZXBhcnRtZW50ID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuRGVwYXJ0bWVudE5hbWUsCiAgICBhZ2VuY3kgPSBNYXRjaGVkT2JqZWN0RGVzY3JpcHRvci5Pcmdhbml6YXRpb25OYW1lLAogICAgbG9jYXRpb24gPSBNYXRjaGVkT2JqZWN0RGVzY3JpcHRvci5Qb3NpdGlvbkxvY2F0aW9uRGlzcGxheSwKICAgIGNsb3NlcyA9IE1hdGNoZWRPYmplY3REZXNjcmlwdG9yLkFwcGxpY2F0aW9uQ2xvc2VEYXRlCiAgKQpgYGAKCmBgYHtyfSAKIyBlYXN5IHZlcnNpb24KbnJvdyhqb2JzX3NtYWxsKQoKdGFibGUoam9ic19zbWFsbCRkZXBhcnRtZW50KSB8PiBzb3J0KGRlY3JlYXNpbmcgPSBUKSB8PiBoZWFkKDMpCgpqb2JzX3NtYWxsIHw+IGRwbHlyOjpjb3VudChkZXBhcnRtZW50KSB8PiAKICBkcGx5cjo6YXJyYW5nZShkcGx5cjo6ZGVzYyhuKSkgfD4gaGVhZCgzKQoKIyBsaXRlcmFsIHZlcnNpb24Kam9ic19zbWFsbCB8PiBkcGx5cjo6ZmlsdGVyKHRpdGxlID09ICdEYXRhIEFuYWx5c3QnKSAtPiBjb3VudF9saXRlcmFsCgojIGhhcmRlciB2ZXJzaW9uCmluZGV4X2RhdGFfYW5hbHlzdCA9IGpvYnNfc21hbGwkdGl0bGUgfD4KICBzdHJpbmdyOjpzdHJfZGV0ZWN0KCJEYXRhIEFuYWx5dGljc3xEYXRhIEFuYWx5c3QiKQoKIyBnaXZlbiB0aGF0IHRoaXMgaXMgYSB0cnVlIG9yIGZhbHNlIHR5cGUgcmVzdWx0CiMgdHJ1ZSByb3dzIHdpbGwgYmUga2VwdCwgbm90aGluZyBtZWFucyBrZWVwIGFsbCBjb2x1bW5zCmNvdW50X2hhcmRlcl9zdGFuZGFyZCA9IGpvYnNfc21hbGxbaW5kZXhfZGF0YV9hbmFseXN0ICwgXSAKY291bnRfaGFyZGVyX3N0YW5kYXJkIHw+IGRwbHlyOjpjb3VudChkZXBhcnRtZW50KSB8PgpkcGx5cjo6YXJyYW5nZShkcGx5cjo6ZGVzYyhuKSkKYGBgCgpgYGB7cn0KaHR0cjI6OnJlcXVlc3QoImh0dHBzOi8vZGF0YS51c2Fqb2JzLmdvdi9hcGkvc2VhcmNoIikgfD4KICBodHRyMjo6cmVxX3VybF9xdWVyeShLZXl3b3JkID0gIkRhdGEgQW5hbHlzdCIsIFJlc3VsdHNQZXJQYWdlID0gNTAwKSB8PgogIGh0dHIyOjpyZXFfaGVhZGVycygKICAgIEhvc3QgPSAiZGF0YS51c2Fqb2JzLmdvdiIsCiAgICAiVXNlci1BZ2VudCIgPSAiZm1lZ2FoZWRAbWlhbWlvaC5lZHUiLAogICAgIkF1dGhvcml6YXRpb24tS2V5IiA9IFN5cy5nZXRlbnYoIlVTQUpPQlNfQVBJX0tFWSIpCiAgKSB8PgogIGh0dHIyOjpyZXFfcGVyZm9ybSgpIHw+CiAgaHR0cjI6OnJlc3BfYm9keV9zdHJpbmcoKSB8PgogIGpzb25saXRlOjpmcm9tSlNPTihmbGF0dGVuID0gVFJVRSkgLT4gdXNhX2pvYnNfbGlzdAoKdXNhX2RmID0gdXNhX2pvYnNfbGlzdCRTZWFyY2hSZXN1bHQkU2VhcmNoUmVzdWx0SXRlbXMKCmpvYnNfc21hbGwgPSB1c2FfZGYgfD4KICBkcGx5cjo6c2VsZWN0KAogICAgdGl0bGUgPSBNYXRjaGVkT2JqZWN0RGVzY3JpcHRvci5Qb3NpdGlvblRpdGxlLAogICAgZGVwYXJ0bWVudCA9IE1hdGNoZWRPYmplY3REZXNjcmlwdG9yLkRlcGFydG1lbnROYW1lLAogICAgYWdlbmN5ID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuT3JnYW5pemF0aW9uTmFtZSwKICAgIGxvY2F0aW9uID0gTWF0Y2hlZE9iamVjdERlc2NyaXB0b3IuUG9zaXRpb25Mb2NhdGlvbkRpc3BsYXksCiAgICBjbG9zZXMgPSBNYXRjaGVkT2JqZWN0RGVzY3JpcHRvci5BcHBsaWNhdGlvbkNsb3NlRGF0ZQogICkKCiMjIEFuc3dlciBCYXNlZCBvbiBRdWVyeQpucm93KGpvYnNfc21hbGwpCiMgcmV0dXJucyBhIG5hbWVkIHZlY3Rvcgp0YWJsZShqb2JzX3NtYWxsJGRlcGFydG1lbnQpIHw+IHNvcnQoZGVjcmVhc2luZyA9IFQpIHw+IGhlYWQoMykKIyByZXR1cm5zIGEgZGYKam9ic19zbWFsbCB8PiBkcGx5cjo6Y291bnQoZGVwYXJ0bWVudCkgfD4gZHBseXI6OmFycmFuZ2UoZHBseXI6OmRlc2MobikpIHw+IGhlYWQoMykKCiMgYW5zd2VyaW5nIEFubmEncyBxdWVzdGlvbiBbbm90ZSB0aGUgbm8gcGlwZTsgdGhlICYgc3RhdGVtZW50XQojIHRoZXJlIGlzIHByb2JhYmx5IG1vcmUgZmFuY3kgd2F5cyBvZiBkb2luZyB0aGlzIGJ1dCB0aGlzIGlzIHRoZSBlYXNpZXN0CiMgd2l0aCBubyByZWd1bGFyIGV4cHJlc3Npb25zCmluZGV4X2RhdGFfYW5hbHlzdCA9ICgKICBzdHJpbmdyOjpzdHJfZGV0ZWN0KGpvYnNfc21hbGwkdGl0bGUsIHBhdHRlcm4gPSAnRGF0YScpICYgCiAgc3RyaW5ncjo6c3RyX2RldGVjdChqb2JzX3NtYWxsJHRpdGxlLCBwYXR0ZXJuID0gJ0FuYWx5c3QnKQopCgoKam9icyA9IGpvYnNfc21hbGxbaW5kZXhfZGF0YV9hbmFseXN0LCBdCnRhYmxlKGpvYnMkZGVwYXJ0bWVudCkKYGBg</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogJ0NsYXNzIDEwOiBXZWIgU2NyYXBpbmcnDQphdXRob3I6ICJGYWRlbCBNIE1lZ2FoZWQiDQpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiDQpvdXRwdXQ6IA0KICBodG1sX2RvY3VtZW50Og0KICAgIHRvYzogdHJ1ZQ0KICAgIHRvY19mbG9hdDogdHJ1ZQ0KICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQ0KICAgIGNvZGVfZG93bmxvYWQ6IHRydWUNCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cNCi0tLQ0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkNCmBgYA0KDQoNCiMjIGByb2JvdHN0eHRgIGV4YW1wbGU6IE1VIGJ1bGxldGluDQoNCkluIHRoZSBjaHVuayBiZWxvdywgd2UgdXNlZCB0aGUgW3JvYm90c3R4dCBwYWNrYWdlXShodHRwczovL2dpdGh1Yi5jb20vcm9wZW5zY2kvcm9ib3RzdHh0KSB0byBjaGVjayBpZiB3ZSBhcmUgYWxsb3dlZCB0byB3cml0ZSBhIHByb2dyYW0gdGhhdCBzY3JhcGVzIHRoZSBwYWdlOiA8aHR0cHM6Ly9idWxsZXRpbi5taWFtaW9oLmVkdS9jb3Vyc2VzLWluc3RydWN0aW9uL2lzYS8+Lg0KDQpgYGB7ciBidWxsZXRpbn0NCnJvYm90c3R4dDo6cGF0aHNfYWxsb3dlZCgNCiAgcGF0aHMgPSAiY291cnNlcy1pbnN0cnVjdGlvbi9pc2EvIiwNCiAgZG9tYWluPSJodHRwczovL2J1bGxldGluLm1pYW1pb2guZWR1LyINCikNCmBgYA0KDQpUaGUgYFRSVUVgIGFib3ZlIG1lYW5zIHRoYXQgd2UgYXJlIGFsbG93ZWQgdG8gc2NyYXBlIGl0Lg0KDQoNCiMjIGByb2JvdHN0eHRgOiBXaWtpcGVkaWENCg0KYGBge3Igd2lraX0NCnJvYm90c3R4dDo6cGF0aHNfYWxsb3dlZCgNCiAgcGF0aHMgPSAiL3dpa2kvIiwgZG9tYWluID0gImh0dHBzOi8vZW4ud2lraXBlZGlhLm9yZyINCiAgICApDQpgYGANCg0KIyMgYHJvYm90c3R4dGA6OiBMaW5rZWRJbg0KDQpgYGB7ciBsaW5rZWRpbn0NCiMgSW4gc29tZSBjYXNlcywgdGhlIHJvYm90c3R4dCBwcm92aWRlcyBpbmNvbnNpc3RlbnQgYW5zd2Vycw0KIyB0eXBpY2FsbHksIHlvdSBnZXQgYSB3YXJuaW5nIHdpdGggdGhlIGFuc3dlciB0aGF0IGlzIGluY29ycmVjdA0KIyBzb2x1dGlvbjogZHJvcCB0aGUgdHJhaWxpbmcgc2xhc2ggZnJvbSB0aGUgVVJMDQojIGV2ZW4gYmV0dGVyIGNoZWNrIHdpdGggdGhlIHJvYm90cy50eHQgKHdoaWNoIGlzIHRoZSBncm91bmQgdHJ1dGgpDQpyb2JvdHN0eHQ6OnBhdGhzX2FsbG93ZWQoDQogIHBhdGhzID0gIi9qb2JzLyIsIGRvbWFpbiA9ICJ3d3cubGlua2VkaW4uY29tIg0KICAgICkNCmBgYA0KDQojIyBTY3JhcGUgTWlhbWkncyBCdWxsZXRpbiBmb3IgSVNBDQoNCmBgYHtyIHNjcmFwZX0NCiMgY2hlY2tpbmcgd2hldGhlciB3ZSBhcmUgYWxsb3dlZCB0byBzY3JhcGUgdGhpcyBpbmZvDQojIFRoaXMgd2FzIGRvbmUgYWJvdmUgYW5kIGZvdW5kIHRvIGJlIFRSVUUNCg0KIyBJIHdpbGwgbG9hZCB0aGUgYmFja2VuZCBvZiB0aGUgSFRNTCBpbnRvIFIgdXNpbmcNCiMgW2FdIHJ2ZXN0OjpyZWFkX2h0bWwoKSB8IHNvbWV0aW1lcyBydmVzdDo6cmVhZF9odG1sX2xpdmUoKSBpZiB0aGUgcGFnZSBoYXMgc29tZSBkeW5hbWljIGNvbnRlbnQNCiMgW2JdIGluIHNvbWUgY2FzZXMsIHdlIHdpbGwgY3JhZnQgdGhpcyBhcyBhIHJlcXVlc3QgYXMgc2hvd24gaW4gc2xpZGVzIGh0dHIyOjpyZXF1ZXN0KCkgPiAuLi4uID4gaHR0cjI6OnJlc3BfYm9keV9odG1sKCkNCmlzYV9jb3Vyc2VzX2luX3IgPSBydmVzdDo6cmVhZF9odG1sKCJodHRwczovL2J1bGxldGluLm1pYW1pb2guZWR1L2NvdXJzZXMtaW5zdHJ1Y3Rpb24vaXNhLyIpDQoNCiMgd2Ugd2lsbCBleHRyYWN0IHRoZSBjb3Vyc2UgdGl0bGVzLCB3aGljaCB3ZSBjYW4gZG8gaW4gYSBzaW5nbGUgcGlwZWxpbmUNCiMgZ2l2ZW4gdGhhdCB0aGV5IGxvb2sgdGhlIHNhbWUgb24gdGhlIHJlbmRlcmVkIHdlYiBwYWdlIGluIENocm9tZQ0KIyAoYm9sZGVkLCBzYW1lIGZvbnQgc2l6ZSBhbmQgc2FtZSBmb250IHR5cGUpDQoNCiMgQ1NTIHNlbGVjdG9yIHdhcyBvYnRhaW5lZCBieToNCiMgW2FdIGhpZ2hsaWdodGluZyB3aGF0IHdlIHdhbnRlZCB0byBwdWxsIChJU0EgNDAxIGNvdXJzZSB0aXRsZSkgaW4gQ2hyb21lIC0+IHJpZ2h0IGNsaWNrDQojICBpbnNwZWN0IC0+IHJpZ2h0IGNsaWNrID4gY29weSAtPiBjb3B5IHNlbGVjdG9yDQojIFtiXSBmcm9tIHRoaXMgc3BlY2lmaWMgZXhhbXBsZSwgd2Ugd2VyZSBhYmxlIHRvIGdldCBqdXN0IHRoZSB0aXRsZSBmb3IgSVNBIDQwMQ0KIyBiZWNhdXNlIHdlIGhhZCBgOm50aC1jaGlsZCgyNClgIC0+IGlmIHlvdSB3ZXJlIHRvIGRyb3AgaXQgLS0+IHlvdSBnZXQgYWxsIHRoZSBjb3Vyc2UgdGl0bGVzDQppc2FfY291cnNlc19pbl9yIHw+IA0KICBydmVzdDo6aHRtbF9lbGVtZW50cygiI3NjX3NjY291cnNlZGVzY3MgPiBkaXYgPiBwLmNvdXJzZWJsb2NrdGl0bGUgPiBzdHJvbmciKSB8PiANCiAgcnZlc3Q6Omh0bWxfdGV4dDIoKSAtPiBpc2FfdGl0bGVzDQogIA0KIyBjb3Vyc2UgZGVzY3JpcHRpb25zIFt1c2luZyBzZWxlY3RvciBnYWRnZXQsIHdoaWNoIGRvZXMgbm90IGFsd2F5cyB3b3JrXQ0KIyBidXQgd2hlbiBpdCB3b3JrcyBpdCBpcyBlYXNpZXINCg0KaXNhX2NvdXJzZXNfaW5fciB8PiANCiAgcnZlc3Q6Omh0bWxfZWxlbWVudHMoIi5jb3Vyc2VibG9ja2Rlc2MiKSB8PiANCiAgcnZlc3Q6Omh0bWxfdGV4dDIoKSAtPiBpc2FfZGVzYw0KDQpkZiA9IGRhdGEuZnJhbWUodGl0bGUgPSBpc2FfdGl0bGVzLCBkZXNjcmlwdGlvbiA9IGlzYV9kZXNjKQ0KYGBgDQoNCg0K</div>
 
 
 </div>
@@ -1852,7 +1702,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("class 08.Rmd");
+  window.initializeSourceEmbed("class10.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
