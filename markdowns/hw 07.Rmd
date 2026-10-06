@@ -1,0 +1,72 @@
+---
+title: "assigmnent 07"
+author: "zina dupal"
+date: "2026-10-05"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_download: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Q1
+
+## Department Info
+```{r dept names}
+departments <- c(
+  "Accountancy",
+  "Economics",
+  "Entrepreneurship",
+  "Finance",
+  "Information Systems -- Analytics",
+  "Marketing",
+  "Management"
+)
+
+base_url <- "https://miamioh.edu/fsb/directory/?up=/query/all/all/"
+
+department_urls <- c(
+  "Accountancy",
+  "Economics",
+  "Entrepreneurship",
+  "Finance",
+  "Information%20Systems%20--%20Analytics",
+  "Marketing",
+  "Management"
+)
+
+urls <- paste0(
+  base_url,
+  department_urls,
+  "/all"
+)
+
+urls
+```
+
+## Scraping
+```{r}
+library(tidyverse)
+library(rvest)
+
+webpage <- read_html(url[1])
+
+webpage
+```
+
+## Scraping departments
+```{r}
+
+```
+
+## Results
+```{r}
+head(fsb_directory)
+```
+
