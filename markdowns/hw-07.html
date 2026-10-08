@@ -13,7 +13,7 @@
 
 <meta name="date" content="2026-10-05" />
 
-<title>class 12: web scraping + LLM-based extraction</title>
+<title>Assignment 07</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1587,151 +1587,209 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">class 12: web scraping + LLM-based
-extraction</h1>
+<h1 class="title toc-ignore">Assignment 07</h1>
 <h4 class="author">zina dupal</h4>
 <h4 class="date">2026-10-05</h4>
 
 </div>
 
 
-<pre class="r"><code>library(ellmer)</code></pre>
-<div id="planecrash-info-example" class="section level2" number="1">
-<h2><span class="header-section-number">1</span> PlaneCrash info
-example</h2>
-<pre class="r"><code>year = 2025
+<div id="q1" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Q1</h1>
+<div id="department-info" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Department info</h2>
+<pre class="r"><code>departments &lt;- c(
+  &quot;Accountancy&quot;,
+  &quot;Economics&quot;,
+  &quot;Entrepreneurship&quot;,
+  &quot;Finance&quot;,
+  &quot;Information Systems &amp; Analytics&quot;,
+  &quot;Marketing&quot;,
+  &quot;Management&quot;
+)
 
-crash_url = paste0(&#39;https://www.planecrashinfo.com/&#39;, year, &#39;/&#39;, year, &#39;.htm&#39;)
+base_url &lt;- &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/&quot;
 
-crash_page &lt;- rvest::read_html(crash_url, encoding = &quot;ISO-8859-1&quot;)
+department_urls &lt;- c(
+  &quot;Accountancy&quot;,
+  &quot;Economics&quot;,
+  &quot;Entrepreneurship&quot;,
+  &quot;Finance&quot;,
+  &quot;Information%20Systems%20--%20Analytics&quot;,
+  &quot;Marketing&quot;,
+  &quot;Management&quot;
+)
 
-# This should now print without the error
-crash_page
+urls &lt;- paste0(
+  base_url,
+  department_urls,
+  &quot;/all&quot;
+)
 
-crash_tables &lt;- crash_page |&gt;
-  rvest::html_elements(&quot;table&quot;) |&gt;
-  rvest::html_table()
-
-crash_df = crash_tables[[1]]
-
-# From a cleaning perspective, there are several things that can be changed:
-# [1] Replace the colnames with the first row
-# [2] Have better column types (e.g., Date being a date instead of chr)
-# [3] There are possible things you can do to clean the data within columns; e.g., split columns that contain multiple pieces of information
-# Column 4 has: fatalities/# passengers (ground fatalities)
-
-# for today&#39;s class, we will focus on the first two
-colnames(crash_df) = crash_df[1, ]
-# then delete first row
-crash_df = crash_df[-1, ]
-
-crash_df = crash_df |&gt; 
-  # converts date into a date object
-  dplyr::mutate(Date = lubridate::dmy(Date))
-
-head(crash_df)</code></pre>
-<pre><code>## {html_document}
-## &lt;html&gt;
-## [1] &lt;head&gt;\n&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8 ...
-## [2] &lt;body&gt;\n&lt;p align=&quot;center&quot;&gt;&lt;b&gt;&lt;font face=&quot;Arial&quot; color=&quot;#B0B6FF&quot; size=&quot;5&quot;&gt; ...
-## # A tibble: 6 × 4
-##   Date       `Location / Operator`             Aircraft Type / Regi…¹ Fatalities
-##   &lt;date&gt;     &lt;chr&gt;                             &lt;chr&gt;                  &lt;chr&gt;     
-## 1 2025-01-07 Off Rottnest Island, WA, Austral… Cessna 208 Caravan 67… 3/7(0)    
-## 2 2025-01-29 Washington DCAmerican Eagle / US… Canadair CRJ-701ER /U… 67/67(0)  
-## 3 2025-01-29 GPOC Unity Airstrip, South Sudan… Beechcraft 1900D5X-RHB 20/21(0)  
-## 4 2025-01-31 Philadelphia, PennsylvaniaMed Je… Learjet 55XA-UCI       6/6(1)    
-## 5 2025-02-06 Norton SoundBering Air            Cessna 208B Grand Car… 10/10(0)  
-## 6 2025-02-17 Toronto, CanadaDelta Connection,… Bombardier CRJ-900LRN… 0/80(0)   
-## # ℹ abbreviated name: ¹​`Aircraft Type / Registration`</code></pre>
+urls</code></pre>
+<pre><code>## [1] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Accountancy/all&quot;                           
+## [2] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Economics/all&quot;                             
+## [3] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Entrepreneurship/all&quot;                      
+## [4] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Finance/all&quot;                               
+## [5] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Information%20Systems%20--%20Analytics/all&quot;
+## [6] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Marketing/all&quot;                             
+## [7] &quot;https://miamioh.edu/fsb/directory/?up=/query/all/all/Management/all&quot;</code></pre>
 </div>
-<div id="game" class="section level2" number="2">
-<h2><span class="header-section-number">2</span> Game</h2>
-<pre class="r"><code>page = rvest::read_html(&quot;https://isa401-salvage.vercel.app/registry?start=1&quot;)
-classes = page |&gt;
-  rvest::html_elements(&quot;.Dreadnought&quot;) |&gt;
-  rvest::html_text2()
-length(classes)  </code></pre>
-<pre><code>## [1] 3</code></pre>
-<pre class="r"><code># From clicking on the site, we saw that our page changes by 50
+<div id="test-scrape-accountancy" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Test scrape:
+Accountancy</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.1     ✔ readr     2.2.0
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(rvest)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rvest&#39;
+## 
+## The following object is masked from &#39;package:readr&#39;:
+## 
+##     guess_encoding</code></pre>
+<pre class="r"><code>webpage &lt;- read_html(urls[1])
 
-base = &quot;https://isa401-salvage.vercel.app&quot;
-starts = seq(from = 1, to = 351, by = 50)
-pages = vector(&quot;list&quot;, length(starts))
-for (i in seq_along(starts)) {
-  pg = rvest::read_html(paste0(base, &quot;/registry?start=&quot;, starts[i]))
-  pages[[i]] = data.frame(
-    class = pg |&gt; rvest::html_elements(&quot;div &gt; ul &gt; li:nth-child(1) &gt; span&quot;) |&gt; rvest::html_text2(),
-    value = pg |&gt; rvest::html_elements(&quot;span.salvage-value&quot;) |&gt; rvest::html_text2() |&gt; stringr::str_remove(&quot; MCr&quot;)
+names &lt;- webpage |&gt;
+  html_elements(&quot;td strong a&quot;) |&gt;
+  html_node(xpath = &quot;text()[1]&quot;) |&gt;
+  html_text2()
+
+positions &lt;- webpage |&gt;
+  html_elements(&quot;td i&quot;) |&gt;
+  html_text2()
+
+websites &lt;- webpage |&gt;
+  html_elements(&quot;td strong a&quot;) |&gt;
+  html_attr(&quot;href&quot;)
+
+names</code></pre>
+<pre><code>##  [1] &quot;Brian Ballou, Ph.D.&quot;       &quot;William Brink, Ph.D.&quot;     
+##  [3] &quot;Qing Burke, Ph.D.&quot;         &quot;Po-Chang Chen, Ph.D.&quot;     
+##  [5] &quot;Matthew Cobabe, Ph.D.&quot;     &quot;Timothy Eaton, Ph.D.&quot;     
+##  [7] &quot;Jan Eighme, Ph.D.&quot;         &quot;Anne Farrell, Ph.D.&quot;      
+##  [9] &quot;Michele Frank, Ph.D.&quot;      &quot;Deborah Gentry&quot;           
+## [11] &quot;Jonathan Grenier, Ph.D.&quot;   &quot;Dan Heitger, Ph.D.&quot;       
+## [13] &quot;David Jenkins, Ph.D.&quot;      &quot;Corrine Kidd&quot;             
+## [15] &quot;Ted (Fikret) Polat&quot;        &quot;Sara Potter&quot;              
+## [17] &quot;Amanda Pyzoha&quot;             &quot;Jonathan Pyzoha, Ph.D.&quot;   
+## [19] &quot;Brent Schmidt, Ph.D.&quot;      &quot;Sydney Shu, Ph.D.&quot;        
+## [21] &quot;Katie Tew, M.S.&quot;           &quot;Matthew Wieland, Ph.D.&quot;   
+## [23] &quot;Li Yang, Ph.D.&quot;            &quot;James (Yibo) Zhang, Ph.D.&quot;</code></pre>
+<pre class="r"><code>positions</code></pre>
+<pre><code>##  [1] &quot;EY Professor of Accounting, William Isaac and\nMichael Oxley Center for Business Leadership Co-Founder, Miami MBA Faculty Director and Professor&quot;
+##  [2] &quot;Professor\n&quot;                                                                                                                                     
+##  [3] &quot;Associate Professor\n&quot;                                                                                                                           
+##  [4] &quot;Associate Professor\n&quot;                                                                                                                           
+##  [5] &quot;Assistant Teaching Professor\n&quot;                                                                                                                  
+##  [6] &quot;Arthur Andersen Alumni Professor &amp; Professor\n&quot;                                                                                                  
+##  [7] &quot;Teaching Professor\n&quot;                                                                                                                            
+##  [8] &quot;Chair &amp; PricewaterhouseCoopers Professor of Accountancy\n&quot;                                                                                       
+##  [9] &quot;Arthur Andersen Alumni Professor, Associate Professor, and MAcc Director\n&quot;                                                                      
+## [10] &quot;Administrative Assistant\n&quot;                                                                                                                      
+## [11] &quot;Professor &amp; FSB Faculty Fellow &amp; C. Rollin Niswonger Professor\n&quot;                                                                                
+## [12] &quot;Deloitte &amp; Touche Professor of Accountancy, William Isaac and\nMichael Oxley Center for Business Leadership Co-Founder and Professor&quot;            
+## [13] &quot;Visiting Assistant Professor\n&quot;                                                                                                                  
+## [14] &quot;Writing Specialist\n&quot;                                                                                                                            
+## [15] &quot;Assistant Teaching Professor\n&quot;                                                                                                                  
+## [16] &quot;Deloitte Introductory Accountancy Course Coordinator\n&quot;                                                                                          
+## [17] &quot;Ernst and Young Professional Development Advisor\n&quot;                                                                                              
+## [18] &quot;Endres Associate Professor Fellow &amp; Assistant Department Chair\n&quot;                                                                                
+## [19] &quot;Assistant Professor\n&quot;                                                                                                                           
+## [20] &quot;Associate Professor &amp; FSB Faculty Fellow\n&quot;                                                                                                      
+## [21] &quot;Assistant Lecturer\n&quot;                                                                                                                            
+## [22] &quot;Associate Professor\n&quot;                                                                                                                           
+## [23] &quot;Assistant Professor\n&quot;                                                                                                                           
+## [24] &quot;Associate Professor\n&quot;</code></pre>
+<pre class="r"><code>websites</code></pre>
+<pre><code>##  [1] &quot;http://www.fsb.miamioh.edu/directory/balloubj&quot;
+##  [2] &quot;http://www.fsb.miamioh.edu/directory/brinkwd&quot; 
+##  [3] &quot;http://www.fsb.miamioh.edu/directory/liaoq&quot;   
+##  [4] &quot;http://www.fsb.miamioh.edu/directory/chenpo&quot;  
+##  [5] &quot;http://www.fsb.miamioh.edu/directory/cobabem&quot; 
+##  [6] &quot;http://www.fsb.miamioh.edu/directory/eatont&quot;  
+##  [7] &quot;http://www.fsb.miamioh.edu/directory/eighmeje&quot;
+##  [8] &quot;http://www.fsb.miamioh.edu/directory/farrela2&quot;
+##  [9] &quot;http://www.fsb.miamioh.edu/directory/frankm&quot;  
+## [10] &quot;http://www.fsb.miamioh.edu/directory/gentrydp&quot;
+## [11] &quot;http://www.fsb.miamioh.edu/directory/greniejh&quot;
+## [12] &quot;http://www.fsb.miamioh.edu/directory/heitgedl&quot;
+## [13] &quot;http://www.fsb.miamioh.edu/directory/jenkindn&quot;
+## [14] &quot;http://www.fsb.miamioh.edu/directory/quecp&quot;   
+## [15] &quot;http://www.fsb.miamioh.edu/directory/polatm&quot;  
+## [16] &quot;http://www.fsb.miamioh.edu/directory/potters4&quot;
+## [17] &quot;http://www.fsb.miamioh.edu/directory/shickar&quot; 
+## [18] &quot;http://www.fsb.miamioh.edu/directory/pyzohajs&quot;
+## [19] &quot;http://www.fsb.miamioh.edu/directory/schmidba&quot;
+## [20] &quot;http://www.fsb.miamioh.edu/directory/shuq2&quot;   
+## [21] &quot;http://www.fsb.miamioh.edu/directory/tewka2&quot;  
+## [22] &quot;http://www.fsb.miamioh.edu/directory/wielanmm&quot;
+## [23] &quot;http://www.fsb.miamioh.edu/directory/yangl3&quot;  
+## [24] &quot;http://www.fsb.miamioh.edu/directory/zhang478&quot;</code></pre>
+</div>
+<div id="scraping-departments" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Scraping
+departments</h2>
+<pre class="r"><code>scrape_department &lt;- function(url, department) {
+  
+  webpage &lt;- read_html(url)
+  
+  names &lt;- webpage |&gt;
+    html_elements(&quot;td strong a&quot;) |&gt;
+    html_node(xpath = &quot;text()[1]&quot;) |&gt;
+    html_text2()
+  
+  positions &lt;- webpage |&gt;
+    html_elements(&quot;td i&quot;) |&gt;
+    html_text2()
+  
+  websites &lt;- webpage |&gt;
+    html_elements(&quot;td strong a&quot;) |&gt;
+    html_attr(&quot;href&quot;)
+  
+  tibble(
+    department = department,
+    name = names,
+    position = positions,
+    website = websites
   )
-  Sys.sleep(1)   # robots.txt asks for it
 }
-registry = dplyr::bind_rows(pages)   # 400 rows?
 
-registry |&gt; dplyr::filter(class == &quot;Dreadnought&quot;) |&gt; 
-  dplyr::mutate(value = as.numeric(value)) -&gt; Dreadnoughts_df
-
-sum(Dreadnoughts_df$value)</code></pre>
-<pre><code>## [1] 224</code></pre>
-</div>
-<div id="structured-text-extraction" class="section level2" number="3">
-<h2><span class="header-section-number">3</span> Structured text
-extraction</h2>
-<div id="course-info" class="section level3" number="3.1">
-<h3><span class="header-section-number">3.1</span> Course info</h3>
-<pre class="r"><code>chat = ellmer::chat_openai(
-  model = &quot;gpt-5.6-luna&quot;, # note that the API Key that I provided only works with 5.6 luna
-  params = ellmer::params(reasoning_effort = &quot;none&quot;)
-)
-
-isa125_text = rvest::read_html(&quot;https://bulletin.miamioh.edu/courses-instruction/isa/&quot;) |&gt; 
-  # for this example, only the first course
-  rvest::html_elements(&quot;#sc_sccoursedescs &gt; div:nth-child(1)&quot;) |&gt; rvest::html_text2()
-
-
-course_info = chat$chat_structured(
-  isa125_text,
-  type = ellmer::type_object(
-    name = ellmer::type_string(
-      description = &quot;Name of the course. For example, ISA 235. Information Technology and the Intelligent Enterprise. Do not include the parantheses for the credit hour and do not end with a period&quot;
-    ),
-    credit_hours = ellmer::type_integer(description = &quot;Return the credit hours that are listed next to the course number and title in paranthesis. Please do not include the paranthesis in your response&quot;),
-   description = ellmer::type_string(description = &quot;The description of the course without the prereqs.&quot;),
-   prereqs = ellmer::type_string(&quot;List the information after Prerequisite:&quot;)
-  )
+fsb_directory &lt;- map2_dfr(
+  urls,
+  departments,
+  scrape_department
 )</code></pre>
 </div>
+<div id="results" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Results</h2>
+<pre class="r"><code>head(fsb_directory)</code></pre>
+<pre><code>## # A tibble: 6 × 4
+##   department  name                  position                             website
+##   &lt;chr&gt;       &lt;chr&gt;                 &lt;chr&gt;                                &lt;chr&gt;  
+## 1 Accountancy Brian Ballou, Ph.D.   &quot;EY Professor of Accounting, Willia… http:/…
+## 2 Accountancy William Brink, Ph.D.  &quot;Professor\n&quot;                        http:/…
+## 3 Accountancy Qing Burke, Ph.D.     &quot;Associate Professor\n&quot;              http:/…
+## 4 Accountancy Po-Chang Chen, Ph.D.  &quot;Associate Professor\n&quot;              http:/…
+## 5 Accountancy Matthew Cobabe, Ph.D. &quot;Assistant Teaching Professor\n&quot;     http:/…
+## 6 Accountancy Timothy Eaton, Ph.D.  &quot;Arthur Andersen Alumni Professor &amp;… http:/…</code></pre>
+<pre class="r"><code>unique(fsb_directory$department)</code></pre>
+<pre><code>## [1] &quot;Accountancy&quot;                     &quot;Economics&quot;                      
+## [3] &quot;Entrepreneurship&quot;                &quot;Finance&quot;                        
+## [5] &quot;Information Systems &amp; Analytics&quot; &quot;Marketing&quot;                      
+## [7] &quot;Management&quot;</code></pre>
 </div>
-<div id="all-50-courses" class="section level2" number="4">
-<h2><span class="header-section-number">4</span> All 50 courses</h2>
-<pre class="r"><code>chat = ellmer::chat_openai(
-  model = &quot;gpt-5.6-luna&quot;, # note that the API Key that I provided only works with 5.6 luna
-  params = ellmer::params(reasoning_effort = &quot;none&quot;)
-)
-
-course_list = 
-  rvest::read_html(&quot;https://bulletin.miamioh.edu/courses-instruction/isa/&quot;) |&gt; 
-  rvest::html_element(&quot;.courseblock&quot;) |&gt; 
-  rvest::html_text2() |&gt; # returns a chr vector
-  as.list() # so as.list() converts to a list to match the example in https://ellmer.tidyverse.org/articles/structured-data.html
-
-type_course = ellmer::type_object(
-    name = ellmer::type_string(
-      description = &quot;Name of the course. For example, ISA 235. Information Technology and the Intelligent Enterprise. Do not include the parantheses for the credit hour and do not end with a period&quot;
-    ),
-    credit_hours = ellmer::type_integer(description = &quot;Return the credit hours that are listed next to the course number and title in paranthesis. Please do not include the paranthesis in your response&quot;),
-    # rename description to desc to make it easier to see the field from the sublist name
-   description = ellmer::type_string(description = &quot;The description of the course without the prereqs.&quot;),
-   prereqs = ellmer::type_string(&quot;List the information after Prerequisite:&quot;)
-  )
-
-isa_df = ellmer::parallel_chat_structured(
-  chat = chat, prompts = course_list, type = type_course,
-  include_tokens = T, include_cost = T
-)</code></pre>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAnY2xhc3MgMTI6IHdlYiBzY3JhcGluZyArIExMTS1iYXNlZCBleHRyYWN0aW9uJwphdXRob3I6ICJ6aW5hIGR1cGFsIgpkYXRlOiAiMjAyNi0xMC0wNSIKb3V0cHV0OiAKICBodG1sX2RvY3VtZW50OgogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9kb3dubG9hZDogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93Ci0tLQoKYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9CmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkKYGBgCgpgYGB7cn0KbGlicmFyeShlbGxtZXIpCmBgYAoKCiMjIFBsYW5lQ3Jhc2ggaW5mbyBleGFtcGxlCgpgYGB7ciBjcmFzaGVzLCByZXN1bHRzPSdob2xkJ30KeWVhciA9IDIwMjUKCmNyYXNoX3VybCA9IHBhc3RlMCgnaHR0cHM6Ly93d3cucGxhbmVjcmFzaGluZm8uY29tLycsIHllYXIsICcvJywgeWVhciwgJy5odG0nKQoKY3Jhc2hfcGFnZSA8LSBydmVzdDo6cmVhZF9odG1sKGNyYXNoX3VybCwgZW5jb2RpbmcgPSAiSVNPLTg4NTktMSIpCgojIFRoaXMgc2hvdWxkIG5vdyBwcmludCB3aXRob3V0IHRoZSBlcnJvcgpjcmFzaF9wYWdlCgpjcmFzaF90YWJsZXMgPC0gY3Jhc2hfcGFnZSB8PgogIHJ2ZXN0OjpodG1sX2VsZW1lbnRzKCJ0YWJsZSIpIHw+CiAgcnZlc3Q6Omh0bWxfdGFibGUoKQoKY3Jhc2hfZGYgPSBjcmFzaF90YWJsZXNbWzFdXQoKIyBGcm9tIGEgY2xlYW5pbmcgcGVyc3BlY3RpdmUsIHRoZXJlIGFyZSBzZXZlcmFsIHRoaW5ncyB0aGF0IGNhbiBiZSBjaGFuZ2VkOgojIFsxXSBSZXBsYWNlIHRoZSBjb2xuYW1lcyB3aXRoIHRoZSBmaXJzdCByb3cKIyBbMl0gSGF2ZSBiZXR0ZXIgY29sdW1uIHR5cGVzIChlLmcuLCBEYXRlIGJlaW5nIGEgZGF0ZSBpbnN0ZWFkIG9mIGNocikKIyBbM10gVGhlcmUgYXJlIHBvc3NpYmxlIHRoaW5ncyB5b3UgY2FuIGRvIHRvIGNsZWFuIHRoZSBkYXRhIHdpdGhpbiBjb2x1bW5zOyBlLmcuLCBzcGxpdCBjb2x1bW5zIHRoYXQgY29udGFpbiBtdWx0aXBsZSBwaWVjZXMgb2YgaW5mb3JtYXRpb24KIyBDb2x1bW4gNCBoYXM6IGZhdGFsaXRpZXMvIyBwYXNzZW5nZXJzIChncm91bmQgZmF0YWxpdGllcykKCiMgZm9yIHRvZGF5J3MgY2xhc3MsIHdlIHdpbGwgZm9jdXMgb24gdGhlIGZpcnN0IHR3bwpjb2xuYW1lcyhjcmFzaF9kZikgPSBjcmFzaF9kZlsxLCBdCiMgdGhlbiBkZWxldGUgZmlyc3Qgcm93CmNyYXNoX2RmID0gY3Jhc2hfZGZbLTEsIF0KCmNyYXNoX2RmID0gY3Jhc2hfZGYgfD4gCiAgIyBjb252ZXJ0cyBkYXRlIGludG8gYSBkYXRlIG9iamVjdAogIGRwbHlyOjptdXRhdGUoRGF0ZSA9IGx1YnJpZGF0ZTo6ZG15KERhdGUpKQoKaGVhZChjcmFzaF9kZikKYGBgCgojIyBHYW1lCgpgYGB7ciBnYW1lfQpwYWdlID0gcnZlc3Q6OnJlYWRfaHRtbCgiaHR0cHM6Ly9pc2E0MDEtc2FsdmFnZS52ZXJjZWwuYXBwL3JlZ2lzdHJ5P3N0YXJ0PTEiKQpjbGFzc2VzID0gcGFnZSB8PgogIHJ2ZXN0OjpodG1sX2VsZW1lbnRzKCIuRHJlYWRub3VnaHQiKSB8PgogIHJ2ZXN0OjpodG1sX3RleHQyKCkKbGVuZ3RoKGNsYXNzZXMpICAKCiMgRnJvbSBjbGlja2luZyBvbiB0aGUgc2l0ZSwgd2Ugc2F3IHRoYXQgb3VyIHBhZ2UgY2hhbmdlcyBieSA1MAoKYmFzZSA9ICJodHRwczovL2lzYTQwMS1zYWx2YWdlLnZlcmNlbC5hcHAiCnN0YXJ0cyA9IHNlcShmcm9tID0gMSwgdG8gPSAzNTEsIGJ5ID0gNTApCnBhZ2VzID0gdmVjdG9yKCJsaXN0IiwgbGVuZ3RoKHN0YXJ0cykpCmZvciAoaSBpbiBzZXFfYWxvbmcoc3RhcnRzKSkgewogIHBnID0gcnZlc3Q6OnJlYWRfaHRtbChwYXN0ZTAoYmFzZSwgIi9yZWdpc3RyeT9zdGFydD0iLCBzdGFydHNbaV0pKQogIHBhZ2VzW1tpXV0gPSBkYXRhLmZyYW1lKAogICAgY2xhc3MgPSBwZyB8PiBydmVzdDo6aHRtbF9lbGVtZW50cygiZGl2ID4gdWwgPiBsaTpudGgtY2hpbGQoMSkgPiBzcGFuIikgfD4gcnZlc3Q6Omh0bWxfdGV4dDIoKSwKICAgIHZhbHVlID0gcGcgfD4gcnZlc3Q6Omh0bWxfZWxlbWVudHMoInNwYW4uc2FsdmFnZS12YWx1ZSIpIHw+IHJ2ZXN0OjpodG1sX3RleHQyKCkgfD4gc3RyaW5ncjo6c3RyX3JlbW92ZSgiIE1DciIpCiAgKQogIFN5cy5zbGVlcCgxKSAgICMgcm9ib3RzLnR4dCBhc2tzIGZvciBpdAp9CnJlZ2lzdHJ5ID0gZHBseXI6OmJpbmRfcm93cyhwYWdlcykgICAjIDQwMCByb3dzPwoKcmVnaXN0cnkgfD4gZHBseXI6OmZpbHRlcihjbGFzcyA9PSAiRHJlYWRub3VnaHQiKSB8PiAKICBkcGx5cjo6bXV0YXRlKHZhbHVlID0gYXMubnVtZXJpYyh2YWx1ZSkpIC0+IERyZWFkbm91Z2h0c19kZgoKc3VtKERyZWFkbm91Z2h0c19kZiR2YWx1ZSkKYGBgCgojIyBTdHJ1Y3R1cmVkIHRleHQgZXh0cmFjdGlvbgoKIyMjIENvdXJzZSBpbmZvCgpgYGB7ciBjb3Vyc2VzfQpjaGF0ID0gZWxsbWVyOjpjaGF0X29wZW5haSgKICBtb2RlbCA9ICJncHQtNS42LWx1bmEiLCAjIG5vdGUgdGhhdCB0aGUgQVBJIEtleSB0aGF0IEkgcHJvdmlkZWQgb25seSB3b3JrcyB3aXRoIDUuNiBsdW5hCiAgcGFyYW1zID0gZWxsbWVyOjpwYXJhbXMocmVhc29uaW5nX2VmZm9ydCA9ICJub25lIikKKQoKaXNhMTI1X3RleHQgPSBydmVzdDo6cmVhZF9odG1sKCJodHRwczovL2J1bGxldGluLm1pYW1pb2guZWR1L2NvdXJzZXMtaW5zdHJ1Y3Rpb24vaXNhLyIpIHw+IAogICMgZm9yIHRoaXMgZXhhbXBsZSwgb25seSB0aGUgZmlyc3QgY291cnNlCiAgcnZlc3Q6Omh0bWxfZWxlbWVudHMoIiNzY19zY2NvdXJzZWRlc2NzID4gZGl2Om50aC1jaGlsZCgxKSIpIHw+IHJ2ZXN0OjpodG1sX3RleHQyKCkKCgpjb3Vyc2VfaW5mbyA9IGNoYXQkY2hhdF9zdHJ1Y3R1cmVkKAogIGlzYTEyNV90ZXh0LAogIHR5cGUgPSBlbGxtZXI6OnR5cGVfb2JqZWN0KAogICAgbmFtZSA9IGVsbG1lcjo6dHlwZV9zdHJpbmcoCiAgICAgIGRlc2NyaXB0aW9uID0gIk5hbWUgb2YgdGhlIGNvdXJzZS4gRm9yIGV4YW1wbGUsIElTQSAyMzUuIEluZm9ybWF0aW9uIFRlY2hub2xvZ3kgYW5kIHRoZSBJbnRlbGxpZ2VudCBFbnRlcnByaXNlLiBEbyBub3QgaW5jbHVkZSB0aGUgcGFyYW50aGVzZXMgZm9yIHRoZSBjcmVkaXQgaG91ciBhbmQgZG8gbm90IGVuZCB3aXRoIGEgcGVyaW9kIgogICAgKSwKICAgIGNyZWRpdF9ob3VycyA9IGVsbG1lcjo6dHlwZV9pbnRlZ2VyKGRlc2NyaXB0aW9uID0gIlJldHVybiB0aGUgY3JlZGl0IGhvdXJzIHRoYXQgYXJlIGxpc3RlZCBuZXh0IHRvIHRoZSBjb3Vyc2UgbnVtYmVyIGFuZCB0aXRsZSBpbiBwYXJhbnRoZXNpcy4gUGxlYXNlIGRvIG5vdCBpbmNsdWRlIHRoZSBwYXJhbnRoZXNpcyBpbiB5b3VyIHJlc3BvbnNlIiksCiAgIGRlc2NyaXB0aW9uID0gZWxsbWVyOjp0eXBlX3N0cmluZyhkZXNjcmlwdGlvbiA9ICJUaGUgZGVzY3JpcHRpb24gb2YgdGhlIGNvdXJzZSB3aXRob3V0IHRoZSBwcmVyZXFzLiIpLAogICBwcmVyZXFzID0gZWxsbWVyOjp0eXBlX3N0cmluZygiTGlzdCB0aGUgaW5mb3JtYXRpb24gYWZ0ZXIgUHJlcmVxdWlzaXRlOiIpCiAgKQopCmBgYAoKIyMgQWxsIDUwIGNvdXJzZXMKCmBgYHtyIGNvdXJzZXM1MH0KY2hhdCA9IGVsbG1lcjo6Y2hhdF9vcGVuYWkoCiAgbW9kZWwgPSAiZ3B0LTUuNi1sdW5hIiwgIyBub3RlIHRoYXQgdGhlIEFQSSBLZXkgdGhhdCBJIHByb3ZpZGVkIG9ubHkgd29ya3Mgd2l0aCA1LjYgbHVuYQogIHBhcmFtcyA9IGVsbG1lcjo6cGFyYW1zKHJlYXNvbmluZ19lZmZvcnQgPSAibm9uZSIpCikKCmNvdXJzZV9saXN0ID0gCiAgcnZlc3Q6OnJlYWRfaHRtbCgiaHR0cHM6Ly9idWxsZXRpbi5taWFtaW9oLmVkdS9jb3Vyc2VzLWluc3RydWN0aW9uL2lzYS8iKSB8PiAKICBydmVzdDo6aHRtbF9lbGVtZW50KCIuY291cnNlYmxvY2siKSB8PiAKICBydmVzdDo6aHRtbF90ZXh0MigpIHw+ICMgcmV0dXJucyBhIGNociB2ZWN0b3IKICBhcy5saXN0KCkgIyBzbyBhcy5saXN0KCkgY29udmVydHMgdG8gYSBsaXN0IHRvIG1hdGNoIHRoZSBleGFtcGxlIGluIGh0dHBzOi8vZWxsbWVyLnRpZHl2ZXJzZS5vcmcvYXJ0aWNsZXMvc3RydWN0dXJlZC1kYXRhLmh0bWwKCnR5cGVfY291cnNlID0gZWxsbWVyOjp0eXBlX29iamVjdCgKICAgIG5hbWUgPSBlbGxtZXI6OnR5cGVfc3RyaW5nKAogICAgICBkZXNjcmlwdGlvbiA9ICJOYW1lIG9mIHRoZSBjb3Vyc2UuIEZvciBleGFtcGxlLCBJU0EgMjM1LiBJbmZvcm1hdGlvbiBUZWNobm9sb2d5IGFuZCB0aGUgSW50ZWxsaWdlbnQgRW50ZXJwcmlzZS4gRG8gbm90IGluY2x1ZGUgdGhlIHBhcmFudGhlc2VzIGZvciB0aGUgY3JlZGl0IGhvdXIgYW5kIGRvIG5vdCBlbmQgd2l0aCBhIHBlcmlvZCIKICAgICksCiAgICBjcmVkaXRfaG91cnMgPSBlbGxtZXI6OnR5cGVfaW50ZWdlcihkZXNjcmlwdGlvbiA9ICJSZXR1cm4gdGhlIGNyZWRpdCBob3VycyB0aGF0IGFyZSBsaXN0ZWQgbmV4dCB0byB0aGUgY291cnNlIG51bWJlciBhbmQgdGl0bGUgaW4gcGFyYW50aGVzaXMuIFBsZWFzZSBkbyBub3QgaW5jbHVkZSB0aGUgcGFyYW50aGVzaXMgaW4geW91ciByZXNwb25zZSIpLAogICAgIyByZW5hbWUgZGVzY3JpcHRpb24gdG8gZGVzYyB0byBtYWtlIGl0IGVhc2llciB0byBzZWUgdGhlIGZpZWxkIGZyb20gdGhlIHN1Ymxpc3QgbmFtZQogICBkZXNjcmlwdGlvbiA9IGVsbG1lcjo6dHlwZV9zdHJpbmcoZGVzY3JpcHRpb24gPSAiVGhlIGRlc2NyaXB0aW9uIG9mIHRoZSBjb3Vyc2Ugd2l0aG91dCB0aGUgcHJlcmVxcy4iKSwKICAgcHJlcmVxcyA9IGVsbG1lcjo6dHlwZV9zdHJpbmcoIkxpc3QgdGhlIGluZm9ybWF0aW9uIGFmdGVyIFByZXJlcXVpc2l0ZToiKQogICkKCmlzYV9kZiA9IGVsbG1lcjo6cGFyYWxsZWxfY2hhdF9zdHJ1Y3R1cmVkKAogIGNoYXQgPSBjaGF0LCBwcm9tcHRzID0gY291cnNlX2xpc3QsIHR5cGUgPSB0eXBlX2NvdXJzZSwKICBpbmNsdWRlX3Rva2VucyA9IFQsIGluY2x1ZGVfY29zdCA9IFQKKQpgYGAKCgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQXNzaWdubWVudCAwNyIKYXV0aG9yOiAiemluYSBkdXBhbCIKZGF0ZTogIjIwMjYtMTAtMDUiCm91dHB1dDogCiAgaHRtbF9kb2N1bWVudDoKICAgIHRvYzogdHJ1ZQogICAgdG9jX2Zsb2F0OiB0cnVlCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKICAgIGNvZGVfZm9sZGluZzogc2hvdwotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQprbml0cjo6b3B0c19jaHVuayRzZXQoZWNobyA9IFRSVUUpCmBgYAoKIyBRMQoKIyMgRGVwYXJ0bWVudCBpbmZvCmBgYHtyIGRlcHQgaW5mb30KZGVwYXJ0bWVudHMgPC0gYygKICAiQWNjb3VudGFuY3kiLAogICJFY29ub21pY3MiLAogICJFbnRyZXByZW5ldXJzaGlwIiwKICAiRmluYW5jZSIsCiAgIkluZm9ybWF0aW9uIFN5c3RlbXMgJiBBbmFseXRpY3MiLAogICJNYXJrZXRpbmciLAogICJNYW5hZ2VtZW50IgopCgpiYXNlX3VybCA8LSAiaHR0cHM6Ly9taWFtaW9oLmVkdS9mc2IvZGlyZWN0b3J5Lz91cD0vcXVlcnkvYWxsL2FsbC8iCgpkZXBhcnRtZW50X3VybHMgPC0gYygKICAiQWNjb3VudGFuY3kiLAogICJFY29ub21pY3MiLAogICJFbnRyZXByZW5ldXJzaGlwIiwKICAiRmluYW5jZSIsCiAgIkluZm9ybWF0aW9uJTIwU3lzdGVtcyUyMC0tJTIwQW5hbHl0aWNzIiwKICAiTWFya2V0aW5nIiwKICAiTWFuYWdlbWVudCIKKQoKdXJscyA8LSBwYXN0ZTAoCiAgYmFzZV91cmwsCiAgZGVwYXJ0bWVudF91cmxzLAogICIvYWxsIgopCgp1cmxzCmBgYAoKIyMgVGVzdCBzY3JhcGU6IEFjY291bnRhbmN5CmBgYHtyIHNjcmFwaW5nfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShydmVzdCkKCndlYnBhZ2UgPC0gcmVhZF9odG1sKHVybHNbMV0pCgpuYW1lcyA8LSB3ZWJwYWdlIHw+CiAgaHRtbF9lbGVtZW50cygidGQgc3Ryb25nIGEiKSB8PgogIGh0bWxfbm9kZSh4cGF0aCA9ICJ0ZXh0KClbMV0iKSB8PgogIGh0bWxfdGV4dDIoKQoKcG9zaXRpb25zIDwtIHdlYnBhZ2UgfD4KICBodG1sX2VsZW1lbnRzKCJ0ZCBpIikgfD4KICBodG1sX3RleHQyKCkKCndlYnNpdGVzIDwtIHdlYnBhZ2UgfD4KICBodG1sX2VsZW1lbnRzKCJ0ZCBzdHJvbmcgYSIpIHw+CiAgaHRtbF9hdHRyKCJocmVmIikKCm5hbWVzCnBvc2l0aW9ucwp3ZWJzaXRlcwpgYGAKCiMjIFNjcmFwaW5nIGRlcGFydG1lbnRzCmBgYHtyIHNjcmFwaW5nIGRlcHRzfQpzY3JhcGVfZGVwYXJ0bWVudCA8LSBmdW5jdGlvbih1cmwsIGRlcGFydG1lbnQpIHsKICAKICB3ZWJwYWdlIDwtIHJlYWRfaHRtbCh1cmwpCiAgCiAgbmFtZXMgPC0gd2VicGFnZSB8PgogICAgaHRtbF9lbGVtZW50cygidGQgc3Ryb25nIGEiKSB8PgogICAgaHRtbF9ub2RlKHhwYXRoID0gInRleHQoKVsxXSIpIHw+CiAgICBodG1sX3RleHQyKCkKICAKICBwb3NpdGlvbnMgPC0gd2VicGFnZSB8PgogICAgaHRtbF9lbGVtZW50cygidGQgaSIpIHw+CiAgICBodG1sX3RleHQyKCkKICAKICB3ZWJzaXRlcyA8LSB3ZWJwYWdlIHw+CiAgICBodG1sX2VsZW1lbnRzKCJ0ZCBzdHJvbmcgYSIpIHw+CiAgICBodG1sX2F0dHIoImhyZWYiKQogIAogIHRpYmJsZSgKICAgIGRlcGFydG1lbnQgPSBkZXBhcnRtZW50LAogICAgbmFtZSA9IG5hbWVzLAogICAgcG9zaXRpb24gPSBwb3NpdGlvbnMsCiAgICB3ZWJzaXRlID0gd2Vic2l0ZXMKICApCn0KCmZzYl9kaXJlY3RvcnkgPC0gbWFwMl9kZnIoCiAgdXJscywKICBkZXBhcnRtZW50cywKICBzY3JhcGVfZGVwYXJ0bWVudAopCmBgYAoKIyMgUmVzdWx0cwpgYGB7ciByZXN1bHRzfQpoZWFkKGZzYl9kaXJlY3RvcnkpCgp1bmlxdWUoZnNiX2RpcmVjdG9yeSRkZXBhcnRtZW50KQpgYGAKCg==</div>
 
 
 </div>
@@ -1769,7 +1827,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("class 12.Rmd");
+  window.initializeSourceEmbed("hw 07.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

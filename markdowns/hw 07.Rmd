@@ -1,5 +1,5 @@
 ---
-title: "assigmnent 07"
+title: "Assignment 07"
 author: "zina dupal"
 date: "2026-10-05"
 output: 
@@ -17,14 +17,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Q1
 
-## Department Info
-```{r dept names}
+## Department info
+```{r dept info}
 departments <- c(
   "Accountancy",
   "Economics",
   "Entrepreneurship",
   "Finance",
-  "Information Systems -- Analytics",
+  "Information Systems & Analytics",
   "Marketing",
   "Management"
 )
@@ -50,23 +50,69 @@ urls <- paste0(
 urls
 ```
 
-## Scraping
-```{r}
+## Test scrape: Accountancy
+```{r scraping}
 library(tidyverse)
 library(rvest)
 
-webpage <- read_html(url[1])
+webpage <- read_html(urls[1])
 
-webpage
+names <- webpage |>
+  html_elements("td strong a") |>
+  html_node(xpath = "text()[1]") |>
+  html_text2()
+
+positions <- webpage |>
+  html_elements("td i") |>
+  html_text2()
+
+websites <- webpage |>
+  html_elements("td strong a") |>
+  html_attr("href")
+
+names
+positions
+websites
 ```
 
 ## Scraping departments
-```{r}
+```{r scraping depts}
+scrape_department <- function(url, department) {
+  
+  webpage <- read_html(url)
+  
+  names <- webpage |>
+    html_elements("td strong a") |>
+    html_node(xpath = "text()[1]") |>
+    html_text2()
+  
+  positions <- webpage |>
+    html_elements("td i") |>
+    html_text2()
+  
+  websites <- webpage |>
+    html_elements("td strong a") |>
+    html_attr("href")
+  
+  tibble(
+    department = department,
+    name = names,
+    position = positions,
+    website = websites
+  )
+}
 
+fsb_directory <- map2_dfr(
+  urls,
+  departments,
+  scrape_department
+)
 ```
 
 ## Results
-```{r}
+```{r results}
 head(fsb_directory)
+
+unique(fsb_directory$department)
 ```
 
