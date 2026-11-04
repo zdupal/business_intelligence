@@ -5,3 +5,4 @@
 .Renviron
 api_key.txt
 .DS_Store
+data/covid_cases_county.csv
